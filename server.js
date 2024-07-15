@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -23,6 +24,7 @@ db.once('open', () => {
 // Middleware
 app.use(bodyParser.json());
 app.use(cors({ origin: 'http://400kvssshankarpally.free.nf' })); // Replace with your frontend domain
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' folder
 
 // Define schema and model
 const feederSchema = new mongoose.Schema({
