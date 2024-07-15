@@ -1,0 +1,493 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body{
+    background: #fff;
+    padding-top: 70px;
+}
+
+.header {
+    background-color: white;
+    color: red;
+    text-decoration: underline 2px;
+    padding: 40px 0;
+    text-align: center;
+    margin-bottom: 0;
+    width: 100%; /* Set the header width to 100% of the viewport */
+    z-index: 1000; /* Ensure the header is above other content */
+}
+
+.header img {
+    position: absolute;
+    top: 15px;
+    left: 25px;
+    width: 140px;
+    height: 120px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.navbar {
+    background-color: white;
+    overflow: hidden;
+    display: flex;
+    justify-content:right;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 0;
+    padding-top: 0px;
+    width: 100%; /* Set the navbar width to 100% of the viewport */
+    top: 50px; /* Set the top position to below the header */
+    z-index: 1000; /* Ensure the navbar is above other content */
+}
+
+.navbar a {
+    color: black;
+    text-align: center;
+    padding: 10px 15px;
+    text-decoration: none;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 18px;
+    margin-left: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.navbar a:hover {
+    background: #ffd000;
+    color: #fff;
+    border-radius: 40px;
+    font-weight: bold;
+}
+
+.navbar a:last-child {
+    margin-right: 10px;
+}
+
+.home {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: url('pexels-eric-anada-1495580.jpg') no-repeat;
+    background-size:cover;
+    background-position: center;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 60px 100px 0;
+    animation: change 10s infinite ease-in-out;
+}
+
+.home .content {
+    max-width: 600px;
+    color: #fff;
+}
+
+.content h2 {
+    font-size: 2em;
+    letter-spacing: 0.1em;
+}
+
+.content p {
+    margin: 10px 0 40px;
+}
+
+.content a {
+    color: #fff;
+    text-decoration: none;
+    border: 2px solid #fff;
+    font-weight: 500;
+    padding: 10px 40px;
+    border-radius: 40px;
+    transition: .5s;
+}
+
+.content a:hover {
+    background: black;
+}
+
+.home .wrapper-login {
+    position: relative;
+    width: 300px;
+}
+
+.wrapper-login h2 {
+    font-size: 2em;
+    color: #fcfbfb;
+    text-align: center;
+}
+
+.wrapper-login .input-box {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin: 40px 0;
+}
+
+.input-box input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 1px solid #fff;
+    outline: none;
+    border-radius: 40px;
+    font-size: 1em;
+    color: #fff;
+    padding: 0 25px 0 45px;
+}
+
+.input-box label {
+    position: absolute;
+    top: 50%;
+    left: 45px;
+    transform: translateY(-50%);
+    font-size: 1em;
+    color: #fff;
+    pointer-events: none;
+    transition: 0.5s;
+}
+
+.input-box input:focus~label,
+.input-box input:valid~label {
+    font-size: 0.8em;
+    top: -14px;
+    left: 17px;
+}
+
+.input-box .icon {
+    position: absolute;
+    top: 14px;
+    left: 15px;
+    font-size: 1.2em;
+    color: #fff;
+}
+
+.wrapper-login .btn {
+    width: 300px;
+    height: 50px;
+    border: 1px solid #fff;
+    border-radius: 40px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #fff;
+}
+
+#about{
+    padding: 80px 0;
+    color: #070707;
+
+}
+
+#row{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+#about-col-1{
+    flex-basis: 35%;
+    padding: 0 30px;
+}
+
+#about-col-1 img{
+    width: 100%;
+    height: 500px;
+    border-radius: 70px 0 70px 0;
+    ;
+}
+#about-col-2{
+    flex-basis: 65%;
+
+}
+
+.sub-title{
+    font-size: 40px;
+    font-weight: 600;
+    padding: 20px;
+}
+.tab-titles{
+    display: flex;
+    margin: 20px 0 40px;
+
+}
+
+.tab-links{
+    margin-right: 50px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+}
+.tab-links::after{
+    content: '';
+    width: 0;
+    height: 3px;
+    background: rgb(21, 128, 190);
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    transition: 0.5s;
+}
+.tab-links.active-link::after{
+    width: 100%;
+}
+.tab-contents ul li{
+    list-style: none;
+    margin: 10px 0;
+   
+}
+.tab-contents ul li span{
+    color:rgb(21, 128, 190);
+    font-size: 14px;
+    font-weight: 800;
+}
+.tab-contents{
+    display: none;
+}
+.tab-contents.active-tab{
+    display: inline-block;
+}
+#services{
+    
+    padding: 30px 0;
+}
+.sub-title{
+    padding: 0 60px;
+}
+.services-list{
+    padding: 10px 60px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 60px;
+    margin-top: 50px;
+    transition: background 0.5s, transform 0.5s;
+    
+
+}
+.services-list div{
+    background: #262626;
+    color: #fff;
+    padding: 40px ;
+    font-size: 13px;
+    font-weight: 300;
+    border-right: 10px;
+    border-radius: 70px 0 70px 0;
+   
+   
+}
+.services-list div h2{
+    color: #fff;
+    font-size: 30px;
+    font-weight: 500;
+    margin-bottom: 15px;
+
+}
+.services-list div a{
+    text-decoration: none;
+    color: #fff;
+    font-size: 12px;
+    margin-top: 20px;
+    display: inline-block;
+    
+}
+.services-list div:hover{
+    background: #ff004f;
+    transform: translateY(-10px);
+}
+
+.classtime-section {
+    background: #151515;
+    padding-top: 90px;
+  }
+  
+  .classtime-section .section-title{
+    margin-bottom: 48px;
+    color: white;
+  }
+  
+  .timetable-controls{
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .spad {
+    padding-top: 100px;
+    padding-bottom: 100px;
+  }
+  .timetable-controls ul li{
+    list-style: none;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Oswald", sans-serif;
+    text-transform: uppercase;
+    color: #f65d5d;
+    display: inline-block;
+    margin-right: 80px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .timetable-controls ul li.active{
+    color: #f65d5d;
+  }
+  
+  .timetable-controls ul li.active::after{
+    opacity: 1;
+  }
+  
+  .timetable-controls ul li::after{
+    position: absolute;
+    left: 0;
+    bottom: -7px;
+    width: 100%;
+    height: 2px;
+    background: #f65d5d;
+    content: "";
+    opacity: 0;
+  }
+  
+  .timetable-controls ul li:last-child{
+    margin-right: 0;
+  }
+  
+  .classtime-table .ts-item{
+    transition: all 0.4s;
+  }
+  
+  .classtime-table.filtering .ts-item{
+    opacity: 0;
+  }
+  
+  .classtime-table.filtering .ts-item.show{
+    opacity: 1;
+  }
+  
+  .classtime-table table{
+    width: 100%;
+    border: 1px solid #1f1f1f;
+    background: #212121;
+    text-align: center;
+  }
+  
+  .classtime-table table thead tr th{
+    font-size: 16px;
+    color: #ffffff;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-family: "Oswald", sans-serif;
+    padding: 25px 5px;
+  }
+  
+  .classtime-table table tbody{
+    border-top: 1px solid #171717;
+  }
+  
+  .classtime-table table tbody tr td{
+    text-align: center;
+    border-right: 1px solid #171717;
+    border-bottom: 1px solid #171717;
+    width: 146px;
+    padding: 26px 10px 28px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .classtime-table table tbody tr td:after{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, #e8505b, #ad1d60);
+    content: "";
+    opacity: 0;
+    z-index: -1;
+    transition: all 0.3s;
+  }
+  
+  .classtime-table table tbody tr td.hover-bg:hover:after{
+    opacity: 1;
+  }
+  
+  .classtime-table table tbody tr td.hover-bg:hover h6 {
+    color: #ffffff;
+  }
+  
+  .classtime-table table tbody tr td.workout-time {
+    font-size: 16px;
+    color: #ffffff;
+    font-weight: 500;
+    font-family: "Oswald", sans-serif;
+  }
+  
+  .classtime-table table tbody tr td span {
+    font-size: 16px;
+    color: #ffffff;
+    display: block;
+    margin-bottom: 7px;
+  }
+  
+  .classtime-table table tbody tr td h6 {
+    color: #f65d5d;
+    font-weight: 500;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    font-size: 14px;
+  }
+
+@keyframes change{
+    0%
+    {
+        background-image: url(image5.jpeg);
+    }
+    20%
+    {
+        background-image: url(image6.jpeg);
+    }
+    40%
+    {
+        background-image: url(image7.jpeg);
+    }
+    60%
+    {
+        background-image: url(images9.jpeg);
+    }
+    80%
+    {
+        background-image: url(images10.jpeg);
+    }
+    100%
+    {
+        background-image: url(images11.jpeg);
+    }
+    120%
+    {
+        background-image: url(images12.jpeg);
+    }
+    140%
+    {
+        background-image: url(images13.jpeg);
+    }
+    160%
+    {
+        background-image: url(images14.jpeg);
+    }
+    180%
+    {
+        background-image: url(images15.jpeg);
+    }
+    200%
+    {
+        background-image: url(images16.jpeg);
+    }
+}

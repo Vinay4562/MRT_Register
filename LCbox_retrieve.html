@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>MRT Testing Details</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            color: #fff;
+        }
+
+        
+        h2 {
+            margin-top: 20px;
+            color: #333;
+            font-size: 40px;
+            text-decoration: underline;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: auto; /* Center align the table */
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center; /* Center align regular cells */
+            color: #333; /* Darker font color for better visibility */
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: #fff;
+            text-align: center; /* Center align header cells */
+            position: relative;
+        }
+
+        th input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Status Column Styling */
+        td.status-cell {
+            border-radius: 5px;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        td.completed-status {
+            background-color: #2ecc71;
+            color: #fff;
+        }
+
+        td.incomplete-status {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+        td.pending-status {
+            background-color: #f39c12;
+            color: #fff;
+        }
+
+        /* Search Box Styling */
+        .search-box {
+            margin-top: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            width: 80%; /* Adjust the width as needed */
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .search-button {
+            padding: 8px 12px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+  <div class="header">
+    <img src="logo_new.png" alt="Logo" class="logo" width="130" height="100">
+    <h1>𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃</h1>
+  </div>
+
+  <!-- Navigation bar -->
+  <div class="navbar">
+    <a href='index.html' class="active">Home</a>
+    <a href="underConstruction.html">LC Procedures</a>
+    <a href='Displaydata_original.html'>Max-Min data</a>
+  </div>
+
+    <h2>MRT Testing Details</h2>
+
+    <!-- Search Box -->
+    <div class="search-box">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search...">
+        <button onclick="searchData()" class="search-button">Search</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Feeder Names</th>
+                <th>Last Tested Date</th>
+                <th>Next Testing Date</th>
+                <th>Status</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody id="displayTableBody">
+            <!-- Data will be populated dynamically using JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchData();
+        });
+
+        async function fetchData() {
+            try {
+                const response = await fetch('http://localhost:3500/feeders');
+                const data = await response.json();
+                const tableBody = document.getElementById("displayTableBody");
+                tableBody.innerHTML = ''; // Clear any existing data
+
+                data.forEach(function (feeder, index) {
+                    addRowToDisplayTable(feeder, index);
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function addRowToDisplayTable(data, index) {
+            const table = document.getElementById("displayTableBody");
+            const newRow = table.insertRow(table.rows.length);
+
+            const cell1 = newRow.insertCell(0);
+            cell1.textContent = index + 1;
+
+            const cell2 = newRow.insertCell(1);
+            cell2.textContent = data.feederName;
+
+            const cell3 = newRow.insertCell(2);
+            cell3.textContent = formatDate(data.lastTestedDate);
+
+            const cell4 = newRow.insertCell(3);
+            cell4.textContent = formatDate(data.scheduledDate);
+
+            const cell5 = newRow.insertCell(4);
+            cell5.textContent = data.status;
+            cell5.className = "status-cell " + data.status.toLowerCase() + "-status";
+
+            const cell6 = newRow.insertCell(5);
+            cell6.textContent = data.remarks;
+        }
+
+        function searchData() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById("displayTableBody");
+            const tr = table.getElementsByTagName("tr");
+
+            for (let i = 0; i < tr.length; i++) {
+                let display = false;
+                const cells = tr[i].getElementsByTagName("td");
+
+                for (let j = 1; j < cells.length; j++) {
+                    const td = cells[j];
+                    if (td) {
+                        const txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            display = true;
+                            break;
+                        }
+                    }
+                }
+
+                tr[i].style.display = display ? "" : "none";
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+    </script>
+</body>
+
+</html>
