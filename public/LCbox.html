@@ -211,7 +211,6 @@
             background-color: #c0392b;
         }
 
-        /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -232,59 +231,100 @@
             opacity: 1;
         }
 
-        /* Form Container */
         .form-container {
-            background-color: #fff;
-            padding: 30px;
+            box-sizing: border-box;
+            width: 80%;
+            max-width: 450px;
+            height: 45vh;
+            max-height: 400px;
+            padding: 20px;
             border-radius: 10px;
+            background-color: #34495e;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transform: scale(0.8);
-            transition: transform 0.3s ease;
+            position: fixed;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3000; /* Increase z-index to ensure modal is on top */
         }
 
         .modal-overlay.active .form-container {
             transform: scale(1);
         }
 
-        /* Close Button */
-        .close-button {
-            background: none;
-            border: none;
-            font-size: 1.5em;
+        .form-container .close-button {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .close-button:hover {
-            transform: rotate(90deg);
-        }
-
-        /* Form Labels and Inputs */
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            margin-top: 10px;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input[type="text"], input[type="date"], select {
-            padding: 10px;
-            border: 2px solid #ddd;
+            top: 10px;
+            right: 10px;
+            background-color: #e74c3c;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
             border-radius: 5px;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-size: 16px;
+            cursor: pointer;
         }
 
-        input[type="text"]:focus, input[type="date"]:focus, select:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
-            outline: none;
+        .form-container form {
+            padding: 20px;
+            border: 1px solid #fff;
+            border-radius: 5px;
+            background-color: #34495e;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-container select,
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .form-container button {
+            margin-top: 10px;
+            margin-right: 10px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+
+        .form-container button.edit-button {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        .form-container button.delete-button {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+        .form-container button:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+
+        .edit-delete-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-top: 5px;
+            margin-bottom: 15px;
         }
 
         /* Save Button */
@@ -308,28 +348,8 @@
             transform: translateY(0);
         }
 
-        /* Responsive Design */
-        @media (max-width: 600px) {
-            .form-container {
-                width: 90%;
-                padding: 20px;
-            }
 
-            .close-button {
-                font-size: 1.2em;
-                top: 10px;
-                right: 10px;
-            }
 
-            label, input[type="text"], input[type="date"], select {
-                font-size: 0.9em;
-            }
-
-            .save-button {
-                padding: 8px;
-            }
-        }
-        
     </style>
 </head>
 
