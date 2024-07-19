@@ -501,27 +501,40 @@
         });
 
         dataTable.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('edit-button')) {
-                const row = e.target.closest('tr');
-                const id = row.dataset.id;
-                currentEditId = id; // Store the current edit ID
-                const rowData = [...row.children].map(cell => cell.textContent);
-                editForm.feederName.value = rowData[1];
-                editForm.lastTestedDate.value = formatDateForInput(rowData[2]);
-                editForm.scheduledDate.value = formatDateForInput(rowData[3]);
-                editForm.status.value = rowData[4];
-                editForm.remarks.value = rowData[5];
-                modalOverlay.style.display = 'flex';
-            } else if (e.target.classList.contains('delete-button')) {
-                const row = e.target.closest('tr');
-                const id = row.dataset.id;
-                await fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${id}`, {
-                    method: 'DELETE'
-                });
-                row.remove();
-                updateSerialNumbers();
+        const target = e.target;
+        const row = target.closest('tr');
+        const id = row.dataset.id;
+
+        if (target.classList.contains('edit-button')) {
+            // Populate form with data for editing
+            const cells = row.querySelectorAll('td');
+            document.querySelector('#feeder-name').value = cells[1].textContent;
+            document.querySelector('#last-tested-date').value = moment(cells[2].textContent).format('YYYY-MM-DD');
+            document.querySelector('#scheduled-date').value = moment(cells[3].textContent).format('YYYY-MM-DD');
+            document.querySelector('#status').value = cells[4].textContent;
+            document.querySelector('#remarks').value = cells[5].textContent;
+            currentEditId = id;
+            modalOverlay.style.display = 'flex';
+        }
+
+        if (target.classList.contains('delete-button')) {
+            // Confirm and delete the feeder
+            if (confirm('Are you sure you want to delete this feeder?')) {
+                try {
+                    const response = await fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${id}`, {
+                        method: 'DELETE'
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Network response was not ok: ${response.status} ${errorText}`);
+                    }
+                    row.remove(); // Remove row from table
+                } catch (error) {
+                    console.error('Error:', error);
+                }
             }
-        });
+        }
+    });
     
         const updateSerialNumbers = () => {
             const rows = dataTable.querySelectorAll('tr');
