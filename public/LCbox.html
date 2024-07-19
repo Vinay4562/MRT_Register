@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
-/* General body styles */
 body {
     margin: 0;
     padding: 0;
@@ -25,7 +24,6 @@ body {
     padding-top: 160px; /* Adjust to ensure content is below fixed header and navbar */
 }
 
-/* Header styles */
 .header {
     background-color: white;
     color: red;
@@ -54,7 +52,6 @@ body {
     font-size: 30px;
 }
 
-/* Navbar styles */
 .navbar {
     background-color: white;
     overflow: hidden;
@@ -94,16 +91,13 @@ body {
     margin-right: 10px;
 }
 
-.back-btn, .logout-btn {
+.back-btn {
+    background-color: #333;
+    color: white;
     padding: 10px 15px;
     border-radius: 5px;
     text-decoration: none;
-    color: white;
-    transition: background-color 0.3s;
-}
-
-.back-btn {
-    background-color: #333;
+    margin-right: 10px;
 }
 
 .back-btn:hover {
@@ -112,6 +106,10 @@ body {
 
 .logout-btn {
     background-color: #f00;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
 }
 
 .logout-btn:hover {
@@ -122,26 +120,28 @@ h2 {
     margin-top: 20px;
 }
 
-/* Table container styles */
 .table-container {
     max-height: 400px;
     overflow-y: auto;
     margin-top: 20px;
     width: 80%;
     box-sizing: border-box;
+    display: block;
 }
 
-/* Table styles */
 table {
     border-collapse: collapse;
     width: 100%;
 }
 
-table, th, td {
+table,
+th,
+td {
     border: 1px solid #fff;
 }
 
-th, td {
+th,
+td {
     padding: 10px;
     text-align: left;
 }
@@ -164,36 +164,53 @@ th {
     z-index: 2;
 }
 
-/* Button styles */
-.edit-button, .delete-button, .add-button {
-    padding: 10px 15px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
 .edit-button {
     background-color: #3498db;
     color: #fff;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .delete-button {
     background-color: #e74c3c;
     color: #fff;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.edit-button:hover, .delete-button:hover {
+.edit-button:hover,
+.delete-button:hover {
     opacity: 0.8;
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+td.completed-status {
+    background-color: #2ecc71;
+}
+
+td.incomplete-status {
+    background-color: #e74c3c;
+}
+
+td.pending-status {
+    background-color: #f39c12;
+}
+
 .add-button {
     margin-top: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
     background-color: #e74c3c;
     color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
 .add-button:hover {
@@ -201,7 +218,6 @@ th {
     transform: scale(1.1);
 }
 
-/* Modal styles */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -210,7 +226,7 @@ th {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 2000;
+    z-index: 2000; /* Increase z-index to ensure modal is on top */
     justify-content: center;
     align-items: center;
     animation: fadeIn 0.3s ease-in-out;
@@ -230,7 +246,7 @@ th {
     top: 25%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 3000;
+    z-index: 3000; /* Increase z-index to ensure modal is on top */
     animation: slideIn 0.3s ease-in-out;
 }
 
@@ -274,10 +290,8 @@ th {
     border-radius: 5px;
     background-color: #ecf0f1;
     color: #2c3e50;
-    box-sizing: border-box; /* Ensures padding and border are included in the total width/height */
 }
 
-/* Button styles in form */
 .form-container button {
     margin-top: 10px;
     margin-right: 10px;
@@ -309,12 +323,12 @@ th {
     justify-content: space-between;
 }
 
-/* Additional input field styling */
 input[type="text"] {
-    width: 100%;
-    padding: 10px;
+    width: 80%;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-top: 5px;
     margin-bottom: 15px;
-    box-sizing: border-box; /* Ensures padding and border are included in the total width/height */
 }
 
 .save-button {
@@ -349,7 +363,6 @@ input[type="text"] {
         transform: translateY(0);
     }
 }
-
 
     </style>
 </head>
