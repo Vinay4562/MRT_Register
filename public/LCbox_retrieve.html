@@ -104,6 +104,29 @@
             border-radius: 5px;
             margin-right: 10px;
         }
+
+        /* Loader Styling */
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            margin-top: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
     </style>
 </head>
 
@@ -123,6 +146,11 @@
   </div>
 
     <h2>MRT Testing Details</h2>
+
+     <!-- Loader -->
+     <div id="loader" class="loader-container">
+        <div class="loader"></div>
+    </div>
 
     <!-- Search Box -->
     <div class="search-box">
@@ -151,6 +179,10 @@
         });
 
         async function fetchData() {
+            const loader = document.getElementById("loader");
+            const searchBox = document.getElementById("searchBox");
+            const dataTable = document.getElementById("dataTable");
+
             try {
                 const response = await fetch('https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders');
                 const data = await response.json();
@@ -160,8 +192,15 @@
                 data.forEach(function (feeder, index) {
                     addRowToDisplayTable(feeder, index);
                 });
+
+                // Hide loader and show table
+                loader.style.display = 'none';
+                searchBox.style.display = 'flex';
+                dataTable.style.display = 'table';
             } catch (error) {
                 console.error('Error fetching data:', error);
+                // Hide loader if there's an error
+                loader.style.display = 'none';
             }
         }
 
