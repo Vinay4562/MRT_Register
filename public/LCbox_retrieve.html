@@ -19,7 +19,6 @@
             color: #fff;
         }
 
-        
         h2 {
             margin-top: 20px;
             color: #333;
@@ -105,19 +104,6 @@
             border-radius: 5px;
             margin-right: 10px;
         }
-
-        .search-button {
-            padding: 8px 12px;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .search-button:hover {
-            background-color: #2980b9;
-        }
     </style>
 </head>
 
@@ -141,7 +127,6 @@
     <!-- Search Box -->
     <div class="search-box">
         <input type="text" id="searchInput" class="search-input" placeholder="Search...">
-        <button onclick="searchData()" class="search-button">Search</button>
     </div>
 
     <table>
@@ -203,6 +188,10 @@
             const cell6 = newRow.insertCell(5);
             cell6.textContent = data.remarks;
         }
+
+        document.getElementById("searchInput").addEventListener("input", function () {
+            searchData();
+        });
 
         function searchData() {
             const input = document.getElementById("searchInput");
