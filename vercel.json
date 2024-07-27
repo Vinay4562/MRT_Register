@@ -8,12 +8,16 @@
   ],
   "routes": [
     {
+      "src": "/",
+      "dest": "/LCbox.html"
+    },
+    {
+      "src": "/LCbox_retrieve",
+      "dest": "/LCbox_retrieve.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/server.js"
     }
-  ],
-  "rewrites": [
-    { "source": "/", "destination": "/LCbox.html" },
-    { "source": "/LCbox_retrieve", "destination": "/LCbox_retrieve.html" }
   ]
 }
