@@ -11,5 +11,9 @@
       "src": "/(.*)",
       "dest": "/server.js"
     }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/LCbox.html" },
+    { "source": "/LCbox_retrieve", "destination": "/LCbox_retrieve.html" }
   ]
 }
