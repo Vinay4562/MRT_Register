@@ -25,6 +25,17 @@ db.once('open', () => {
     console.log('Connected to MongoDB');
 });
 
+// Define schema and model (Move the schema definition here)
+const FeederSchema = new mongoose.Schema({
+    feederName: { type: String, required: true },
+    lastTestedDate: { type: Date, required: true },
+    scheduledDate: { type: Date, required: true },
+    status: { type: String, required: true },
+    remarks: { type: String } // Optional field
+});
+
+const Feeder = mongoose.model('Feeder', FeederSchema);
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
@@ -38,21 +49,9 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash()); // Add this line to use flash messages
-app.use(require('connect-flash')());
+app.use(flash());
 app.use(cors({ origin: 'http://400kvssshankarpally.free.nf' })); // Replace with your frontend domain
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' folder
-
-// Define schema and model
-const feederSchema = new mongoose.Schema({
-    feederName: { type: String, required: true },
-    lastTestedDate: { type: Date, required: true },
-    scheduledDate: { type: Date, required: true },
-    status: { type: String, required: true },
-    remarks: { type: String }
-});
-
-const Feeder = mongoose.model('Feeder', feederSchema);
 
 // Mock user data (replace with database logic)
 const users = [
@@ -115,18 +114,17 @@ app.get('/LCbox.html', isAuthenticated, (req, res) => {
 app.post('/logout', (req, res, next) => {
     req.logout((err) => {
       if (err) {
-        return next(err); // Pass errors to the error handling middleware
+        return next(err);
       }
       req.session.destroy((err) => {
         if (err) {
-          return next(err); // Pass errors to the error handling middleware
+          return next(err);
         }
-        res.clearCookie('connect.sid'); // Clear the session cookie
-        res.redirect('/'); // Redirect to login page
+        res.clearCookie('connect.sid');
+        res.redirect('/');
       });
     });
-  });
-
+});
 
 // Routes
 app.get('/feeders', async (req, res) => {
@@ -141,7 +139,7 @@ app.get('/feeders', async (req, res) => {
 app.post('/feeders', async (req, res) => {
     const { feederName, lastTestedDate, scheduledDate, status, remarks } = req.body;
 
-    if (!feederName || !lastTestedDate || !scheduledDate || !status || !remarks ) {
+    if (!feederName || !lastTestedDate || !scheduledDate || !status) {
         return res.status(400).json({ message: 'Validation failed: Missing required fields' });
     }
 
