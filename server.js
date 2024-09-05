@@ -1,13 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const session = require('express-session');
-const flash = require('connect-flash');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 
 const app = express();
 const port = process.env.PORT || 3500;
@@ -25,106 +21,21 @@ db.once('open', () => {
     console.log('Connected to MongoDB');
 });
 
-// Define schema and model (Move the schema definition here)
-const FeederSchema = new mongoose.Schema({
+// Middleware
+app.use(bodyParser.json());
+app.use(cors({ origin: 'http://400kvssshankarpally.free.nf' })); // Replace with your frontend domain
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' folder
+
+// Define schema and model
+const feederSchema = new mongoose.Schema({
     feederName: { type: String, required: true },
     lastTestedDate: { type: Date, required: true },
     scheduledDate: { type: Date, required: true },
     status: { type: String, required: true },
-    remarks: { type: String } // Optional field
+    remarks: { type: String }
 });
 
-const Feeder = mongoose.model('Feeder', FeederSchema);
-
-// Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({
-    secret: 'chantichanti2255',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false, // Set to true if using https
-        maxAge: 1000 * 60 * 5 // Session expires after 5 minutes of inactivity
-    }
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
-app.use(cors({ origin: 'http://400kvssshankarpally.free.nf' })); // Replace with your frontend domain
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' folder
-
-// Mock user data (replace with database logic)
-const users = [
-    { id: 1, username: 'Shankarpally400kv', password: 'Shankarpally@9870' }
-];
-
-// Passport local strategy
-passport.use(new LocalStrategy(
-    (username, password, done) => {
-        const user = users.find(u => u.username === username && u.password === password);
-        if (!user) {
-            return done(null, false, { message: 'Incorrect username or password.' });
-        }
-        return done(null, user);
-    }
-));
-
-passport.serializeUser((user, done) => {
-    done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-    const user = users.find(u => u.id === id);
-    done(null, user);
-});
-
-// Cache Control to prevent accessing pages after logout
-app.use((req, res, next) => {
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
-    res.set('Surrogate-Control', 'no-store');
-    next();
-});
-
-// Routes
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/login.html');
-});
-
-app.post('/login', passport.authenticate('local', {
-    successRedirect: '/LCbox.html',
-    failureRedirect: '/',
-    failureFlash: true
-}));
-
-// Ensure the user is authenticated for LCbox.html access
-function isAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect('/');
-}
-
-app.get('/LCbox.html', isAuthenticated, (req, res) => {
-    res.sendFile(__dirname + '/public/LCbox.html.html');
-});
-
-// Logout route
-app.post('/logout', (req, res, next) => {
-    req.logout((err) => {
-      if (err) {
-        return next(err);
-      }
-      req.session.destroy((err) => {
-        if (err) {
-          return next(err);
-        }
-        res.clearCookie('connect.sid');
-        res.redirect('/');
-      });
-    });
-});
+const Feeder = mongoose.model('Feeder', feederSchema);
 
 // Routes
 app.get('/feeders', async (req, res) => {
@@ -137,14 +48,8 @@ app.get('/feeders', async (req, res) => {
 });
 
 app.post('/feeders', async (req, res) => {
-    const { feederName, lastTestedDate, scheduledDate, status, remarks } = req.body;
-
-    if (!feederName || !lastTestedDate || !scheduledDate || !status) {
-        return res.status(400).json({ message: 'Validation failed: Missing required fields' });
-    }
-
+    const feeder = new Feeder(req.body);
     try {
-        const feeder = new Feeder({ feederName, lastTestedDate, scheduledDate, status, remarks });
         await feeder.save();
         res.status(201).json(feeder);
     } catch (error) {
