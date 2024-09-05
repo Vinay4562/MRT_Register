@@ -132,12 +132,21 @@
 
         editForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Collect form data
             const formData = new FormData(editForm);
             const formObject = Object.fromEntries(formData.entries());
+
+            // Validate required fields
+            if (!formObject.feederName || !formObject.lastTestedDate || !formObject.scheduledDate || !formObject.status) {
+                console.error('Validation error: Missing required fields');
+                return;
+            }
 
             try {
                 let response;
                 if (currentEditId) {
+                    // Update existing record
                     response = await fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${currentEditId}`, {
                         method: 'PUT',
                         headers: {
@@ -146,6 +155,7 @@
                         body: JSON.stringify(formObject)
                     });
                 } else {
+                    // Create new record
                     response = await fetch('https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders', {
                         method: 'POST',
                         headers: {
@@ -162,6 +172,7 @@
 
                 const data = await response.json();
                 if (currentEditId) {
+                    // Update existing row
                     const row = document.querySelector(`tr[data-id="${currentEditId}"]`);
                     row.cells[1].textContent = data.feederName;
                     row.cells[2].textContent = formatDate(data.lastTestedDate);
@@ -169,6 +180,7 @@
                     row.cells[4].textContent = data.status;
                     row.cells[5].textContent = data.remarks;
                 } else {
+                    // Add new row
                     const newRow = document.createElement('tr');
                     newRow.dataset.id = data._id;
                     newRow.innerHTML = `
