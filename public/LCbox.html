@@ -55,23 +55,23 @@
             <form id="edit-form">
                 <label for="feeder-name">Feeder Name:</label>
                 <input type="text" id="feeder-name" name="feederName" required>
-
+            
                 <label for="last-tested-date">Last Tested Date:</label>
                 <input type="date" id="last-tested-date" name="lastTestedDate" required>
-
+            
                 <label for="scheduled-date">Scheduled Date:</label>
                 <input type="date" id="scheduled-date" name="scheduledDate" required>
-
+            
                 <label for="status">Status:</label>
                 <select id="status" name="status" required>
                     <option value="Pending">Pending</option>
                     <option value="Incomplete">Incomplete</option>
                     <option value="Completed">Completed</option>
                 </select>
-
+            
                 <label for="remarks">Remarks:</label>
                 <input type="text" id="remarks" name="remarks">
-
+            
                 <div class="edit-delete-buttons">
                     <button type="submit" class="save-button">Save</button>
                 </div>
@@ -132,6 +132,19 @@
 
         editForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Validate that required fields are filled
+            const feederName = document.querySelector('#feeder-name').value.trim();
+            const lastTestedDate = document.querySelector('#last-tested-date').value;
+            const scheduledDate = document.querySelector('#scheduled-date').value;
+            const status = document.querySelector('#status').value;
+            const remarks = document.querySelector('#remarks').value;  // Capture remarks field
+
+            if (!feederName || !lastTestedDate || !scheduledDate || !status) {
+                alert("Please fill all the required fields.");
+                return; // Stop submission if fields are missing
+            }
+
             const formData = new FormData(editForm);
             const formObject = Object.fromEntries(formData.entries());
 
@@ -161,14 +174,17 @@
                 }
 
                 const data = await response.json();
+                
                 if (currentEditId) {
+                    // Update the existing row
                     const row = document.querySelector(`tr[data-id="${currentEditId}"]`);
                     row.cells[1].textContent = data.feederName;
                     row.cells[2].textContent = formatDate(data.lastTestedDate);
                     row.cells[3].textContent = formatDate(data.scheduledDate);
                     row.cells[4].textContent = data.status;
-                    row.cells[5].textContent = data.remarks;
+                    row.cells[5].textContent = data.remarks; // Update the remarks
                 } else {
+                    // Add a new row
                     const newRow = document.createElement('tr');
                     newRow.dataset.id = data._id;
                     newRow.innerHTML = `
@@ -189,6 +205,7 @@
                 console.error('Submit error: ', error);
             }
         });
+
 
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('edit-button')) {
