@@ -154,7 +154,6 @@ app.post('/feeders', async (req, res) => {
     }
 });
 
-
 app.put('/feeders/:id', async (req, res) => {
     const { id } = req.params;
     try {
