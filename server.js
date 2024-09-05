@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
@@ -52,6 +52,8 @@ const Feeder = mongoose.model('Feeder', feederSchema);
 const defaultUsername = 'Shankarpally400kv';
 const defaultPassword = 'Shankarpally@9870'; // Use bcrypt to hash the password
 
+const hashedPassword = bcrypt.hashSync('Shankarpally@9870', 10);
+
 // Route to render login page
 app.get('/login', (req, res) => {
     if (req.session.loggedIn) {
@@ -65,11 +67,10 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    // Check username and password against default credentials
-    if (username === defaultUsername && password === defaultPassword) {
+    if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
         req.session.loggedIn = true;
         req.session.username = username;
-        return res.redirect('/LCbox.html'); // Redirect to LCbox.html upon successful login
+        return res.redirect('/LCbox.html');
     }
 
     res.status(401).send('Invalid credentials. <a href="/login">Try again</a>');
