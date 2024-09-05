@@ -138,8 +138,9 @@
             const lastTestedDate = document.querySelector('#last-tested-date').value;
             const scheduledDate = document.querySelector('#scheduled-date').value;
             const status = document.querySelector('#status').value;
+            const remarks = document.querySelector('#remarks').value;
 
-            if (!feederName || !lastTestedDate || !scheduledDate || !status) {
+            if (!feederName || !lastTestedDate || !scheduledDate || !status || !remarks) {
                 alert("Please fill all the required fields.");
                 return; // Stop submission if fields are missing
             }
