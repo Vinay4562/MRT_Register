@@ -138,7 +138,7 @@
             try {
                 let response;
                 if (currentEditId) {
-                    response = await fetch(`/feeders/${currentEditId}`, {
+                    response = await fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${currentEditId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
@@ -146,7 +146,7 @@
                         body: JSON.stringify(formObject)
                     });
                 } else {
-                    response = await fetch('/feeders', {
+                    response = await fetch('https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -213,7 +213,7 @@
                 const id = row.dataset.id;
 
                 if (confirm('Are you sure you want to delete this item?')) {
-                    fetch(`/feeders/${id}`, {
+                    fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${id}`, {
                         method: 'DELETE'
                     })
                     .then(response => {
