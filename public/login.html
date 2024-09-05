@@ -3,223 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Login</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(-45deg, #f39c12, #8e44ad, #3498db, #e74c3c);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
             height: 100vh;
             margin: 0;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .header {
-            width: 100%;
-            padding: 20px;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.2);
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            color: #fff;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-
-        .logo {
-            width: 100px;
-            height: 100px;
-            vertical-align: middle;
-            margin-right: 15px;
-            background-color: #fff;
-        }
-
-        .header h1 {
-            display: inline-block;
-            font-size: 2.3rem;
-            text-decoration: underline;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .navbar a {
-            text-decoration: none;
-            padding: 10px 20px;
-            margin: 0 10px;
-            background-color: #fff;
-            border-radius: 20px;
-            color: #333;
-            font-weight: bold;
-            transition: background-color 0.3s, color 0.3s;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .navbar a:hover {
-            background-color: #3498db;
-            color: #fff;
+            background: linear-gradient(135deg, #6B73FF, #000DFF);
+            overflow: hidden;
         }
 
         .login-container {
             background-color: #fff;
-            padding: 30px;
+            padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            width: 350px;
-            transform: translateY(-50px);
-            animation: slideIn 1s forwards;
-        }
-
-        @keyframes slideIn {
-            0% {
-                opacity: 0;
-                transform: translateY(-150px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
-            letter-spacing: 1px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            position: relative;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-        }
-
-        input[type="text"],
-        input[type="password"] {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            max-width: 350px;
             width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            transform: translateY(0);
+            transition: transform 0.3s ease-in-out;
         }
 
-        input[type="text"]:focus,
-        input[type="password"]:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 8px rgba(52, 152, 219, 0.6);
-            outline: none;
+        .login-container:hover {
+            transform: translateY(-10px);
         }
 
-        .toggle-password {
+        h1 {
+            margin-bottom: 30px;
+            font-size: 26px;
+            color: #333;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        h1::after {
+            content: "";
+            width: 50px;
+            height: 3px;
+            background-color: #6B73FF;
             position: absolute;
-            right: 10px;
-            top: 35px;
-            cursor: pointer;
-            color: #3498db;
-            font-size: 14px;
+            left: 50%;
+            bottom: -10px;
+            transform: translateX(-50%);
+            border-radius: 5px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease-in-out;
+            background-color: #f9f9f9;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #6B73FF;
+            box-shadow: 0 0 8px rgba(107, 115, 255, 0.6);
+            background-color: #fff;
         }
 
         button {
-            background-color: #4CAF50;
+            width: 100%;
+            padding: 12px;
+            background-color: #6B73FF;
             color: white;
             border: none;
-            padding: 12px 25px;
-            text-align: center;
-            text-decoration: none;
-            font-size: 16px;
-            margin-top: 15px;
+            border-radius: 8px;
             cursor: pointer;
-            border-radius: 25px;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 5px #2e7d32;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         button:hover {
-            background-color: #45a049;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            background-color: #000DFF;
+            transform: scale(1.05);
         }
 
         button:active {
-            background-color: #3e8e41;
-            box-shadow: 0 3px #2e7d32;
-            transform: translateY(2px);
+            transform: scale(0.98);
         }
 
-        .login-message {
-            color: green;
-            font-size: 16px;
-            margin-top: 15px;
-            display: none;
+        @keyframes floating {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .login-container {
+            animation: floating 3s ease-in-out infinite;
         }
     </style>
 </head>
 <body>
-
-    <header class="header">
-        <img src="logo_new.png" alt="Company Logo" class="logo">
-        <h1>Transmission Corporation of Telangana Limited</h1>
-    </header>
-
-    <div class="navbar">
-        <a href='https://400kvssshankarpally.free.nf/'>Home</a>
-        <a href="#">LC Procedures</a>
-        <a href='https://maxregister-git-main-vinay-kumars-projects-f1559f4a.vercel.app/Displaydata_original.html'>Max-Min Data</a>
-    </div>
-
     <div class="login-container">
-        <h2>MRT Schedule Login</h2>
-        <form id="loginForm" action="/login" method="POST">
-            <div class="input-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-                <span class="toggle-password" onclick="togglePassword()">Show</span>
-            </div>
+        <h1>Login</h1>
+        <form action="/login" method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Login</button>
-            <p class="login-message" id="loginMessage">Login Successful!</p>
         </form>
     </div>
-
-    <script>
-        // Function to toggle password visibility
-        function togglePassword() {
-            var passwordField = document.getElementById("password");
-            var toggleText = document.querySelector(".toggle-password");
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                toggleText.textContent = "Hide";
-            } else {
-                passwordField.type = "password";
-                toggleText.textContent = "Show";
-            }
-        }
-    </script>
-
 </body>
 </html>

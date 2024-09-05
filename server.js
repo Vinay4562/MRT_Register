@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
@@ -22,9 +24,18 @@ db.once('open', () => {
 });
 
 // Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors({ origin: 'http://400kvssshankarpally.free.nf' })); // Replace with your frontend domain
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' folder
+
+// Session Middleware
+app.use(session({
+    secret: 'mysecretkey',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 60000 } // session will expire in 60 seconds (for testing)
+}));
 
 // Define schema and model
 const feederSchema = new mongoose.Schema({
@@ -36,6 +47,52 @@ const feederSchema = new mongoose.Schema({
 });
 
 const Feeder = mongoose.model('Feeder', feederSchema);
+
+// Default credentials (for testing)
+const defaultUsername = 'Shankarpally400kv';
+const defaultPassword = 'Shankarpally@9870'; // Use bcrypt to hash the password
+
+// Route to render login page
+app.get('/login', (req, res) => {
+    if (req.session.loggedIn) {
+        res.redirect('/LCbox.html'); // Redirect if already logged in
+    } else {
+        res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    }
+});
+
+// Route to handle login
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    // Check username and password against default credentials
+    if (username === defaultUsername && password === defaultPassword) {
+        req.session.loggedIn = true;
+        req.session.username = username;
+        return res.redirect('/LCbox.html'); // Redirect to LCbox.html upon successful login
+    }
+
+    res.status(401).send('Invalid credentials. <a href="/login">Try again</a>');
+});
+
+// Route to handle logout
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).send('Error logging out');
+        }
+        res.redirect('/login');
+    });
+});
+
+// Protected route for LCbox.html
+app.get('/LCbox.html', (req, res) => {
+    if (req.session.loggedIn) {
+        res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
+    } else {
+        res.redirect('/login');
+    }
+});
 
 // Routes
 app.get('/feeders', async (req, res) => {
