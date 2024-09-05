@@ -9,6 +9,100 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="LCboxstyles.css">
+
+    
+    <style>
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            position: relative;
+            width: 50%;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .edit-delete-buttons {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .save-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .logout-btn {
+            float: right;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .table-container {
+            margin: 20px;
+        }
+        .add-button {
+            margin: 10px 0;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .edit-button, .delete-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .delete-button {
+            background-color: #f44336;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .pending-status {
+            color: orange;
+        }
+        .incomplete-status {
+            color: red;
+        }
+        .completed-status {
+            color: green;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,11 +113,11 @@
     </div>
 
     <!-- Navigation bar -->
-  <div class="navbar">
-    <form id="logoutForm" action="/logout" method="POST">
-      <button type="submit" class="logout-btn">Logout</button>
-  </form>
-  </div>
+    <div class="navbar">
+        <form id="logoutForm" action="/logout" method="POST">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </div>
 
     <h2>MRT Testing Details Schedule Page</h2>
 
@@ -140,7 +234,7 @@
             const status = document.querySelector('#status').value;
             const remarks = document.querySelector('#remarks').value;
 
-            if (!feederName || !lastTestedDate || !scheduledDate || !status || !remarks) {
+            if (!feederName || !lastTestedDate || !scheduledDate || !status) {
                 alert("Please fill all the required fields.");
                 return; // Stop submission if fields are missing
             }
@@ -225,28 +319,19 @@
             } else if (e.target.classList.contains('delete-button')) {
                 const row = e.target.closest('tr');
                 const id = row.dataset.id;
-
-                if (confirm('Are you sure you want to delete this item?')) {
-                    fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${id}`, {
-                        method: 'DELETE'
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        row.remove();
-                    })
-                    .catch(error => console.error('Delete error: ', error));
-                }
+                fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    row.remove();
+                })
+                .catch(error => console.error('Delete error: ', error));
             }
         });
 
-        window.onload = fetchData;
-
-        function preventBack() {
-            window.history.forward();
-        }
-
-        setTimeout("preventBack()", 0);
-        window.onunload = function () { null};
+        // Fetch initial data
+        fetchData();
     </script>
 </body>
 </html>

@@ -139,12 +139,12 @@ app.get('/feeders', async (req, res) => {
 app.post('/feeders', async (req, res) => {
     const { feederName, lastTestedDate, scheduledDate, status, remarks } = req.body;
 
-    if (!feederName || !lastTestedDate || !scheduledDate || !status || !remarks) {
+    if (!feederName || !lastTestedDate || !scheduledDate || !status) {
         return res.status(400).json({ message: 'Validation failed: Missing required fields' });
     }
 
     try {
-        const feeder = new Feeder(req.body);
+        const feeder = new Feeder({ feederName, lastTestedDate, scheduledDate, status, remarks });
         await feeder.save();
         res.status(201).json(feeder);
     } catch (error) {
