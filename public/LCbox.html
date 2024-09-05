@@ -135,6 +135,8 @@
             const formData = new FormData(editForm);
             const formObject = Object.fromEntries(formData.entries());
 
+            console.log('Form Object:', formObject); // Log form data to check if all required fields are present
+
             try {
                 let response;
                 if (currentEditId) {
@@ -187,7 +189,6 @@
                 console.error('Submit error: ', error);
             }
         });
-
 
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('edit-button')) {
