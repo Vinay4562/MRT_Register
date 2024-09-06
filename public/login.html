@@ -29,12 +29,15 @@
             padding: 20px;
             text-align: center;
             background-color: rgba(255, 255, 255, 0.2);
-            margin-bottom: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             color: #fff;
             text-transform: uppercase;
             font-weight: bold;
             letter-spacing: 2px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
         }
 
         .logo {
@@ -54,7 +57,13 @@
         .navbar {
             display: flex;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-top: 70px;
+            background-color: transparent;
+            position: fixed;
+            top: 80px; /* Adjust based on the height of the header */
+            left: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
         .navbar a {
@@ -81,7 +90,7 @@
             box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
             text-align: center;
             width: 350px;
-            transform: translateY(-50px);
+            margin-top: 170px; /* Adjust based on the height of the header and navbar */
             animation: slideIn 1s forwards;
         }
 
@@ -174,6 +183,7 @@
             margin-top: 15px;
             display: none;
         }
+
     </style>
 </head>
 <body>
