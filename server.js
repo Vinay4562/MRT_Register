@@ -54,6 +54,14 @@ const defaultPassword = 'Shankarpally@9870'; // Use bcrypt to hash the password
 
 const hashedPassword = bcrypt.hashSync('Shankarpally@9870', 10);
 
+// Middleware to check authentication
+const ensureAuthenticated = (req, res, next) => {
+    if (req.session.loggedIn) {
+        return next();
+    }
+    res.redirect('/login');
+};
+
 // Route to render login page
 app.get('/login', (req, res) => {
     if (req.session.loggedIn) {
@@ -87,16 +95,12 @@ app.get('/logout', (req, res) => {
 });
 
 // Protected route for LCbox.html
-app.get('/LCbox.html', (req, res) => {
-    if (req.session.loggedIn) {
-        res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
-    } else {
-        res.redirect('/login');
-    }
+app.get('/LCbox.html', ensureAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
 });
 
-// Routes
-app.get('/feeders', async (req, res) => {
+// Routes for feeders
+app.get('/feeders', ensureAuthenticated, async (req, res) => {
     try {
         const feeders = await Feeder.find();
         res.json(feeders);
@@ -105,7 +109,7 @@ app.get('/feeders', async (req, res) => {
     }
 });
 
-app.post('/feeders', async (req, res) => {
+app.post('/feeders', ensureAuthenticated, async (req, res) => {
     const feeder = new Feeder(req.body);
     try {
         await feeder.save();
@@ -115,7 +119,7 @@ app.post('/feeders', async (req, res) => {
     }
 });
 
-app.put('/feeders/:id', async (req, res) => {
+app.put('/feeders/:id', ensureAuthenticated, async (req, res) => {
     const { id } = req.params;
     try {
         const updatedFeeder = await Feeder.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
@@ -128,7 +132,7 @@ app.put('/feeders/:id', async (req, res) => {
     }
 });
 
-app.delete('/feeders/:id', async (req, res) => {
+app.delete('/feeders/:id', ensureAuthenticated, async (req, res) => {
     const { id } = req.params;
     try {
         const feeder = await Feeder.findByIdAndDelete(id);
