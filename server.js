@@ -2,10 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs'); // Using bcryptjs for password hashing
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
+const helmet = require('helmet'); // For added security
+require('dotenv').config(); // Load environment variables
 
 const app = express();
 const port = process.env.PORT || 3500;
@@ -26,15 +27,19 @@ db.once('open', () => {
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors({ origin: 'http://400kvssshankarpally.free.nf' })); // Replace with your frontend domain
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' folder
+app.use(helmet()); // Use Helmet to set various HTTP headers for security
+app.use(cors({
+    origin: ['http://400kvssshankarpally.free.nf', 'http://localhost:3000'], // Allow multiple origins
+    credentials: true // Allow cookies to be sent with CORS requests
+}));
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from 'public' folder
 
 // Session Middleware
 app.use(session({
-    secret: 'mysecretkey',
+    secret: process.env.SESSION_SECRET || 'mysecretkey', // Use environment variable for session secret
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60000 } // session will expire in 60 seconds (for testing)
+    cookie: { maxAge: 60000, secure: process.env.NODE_ENV === 'production' } // Secure cookies in production
 }));
 
 // Define schema and model
@@ -50,7 +55,7 @@ const Feeder = mongoose.model('Feeder', feederSchema);
 
 // Default credentials (for testing)
 const defaultUsername = 'Shankarpally400kv';
-const defaultPassword = 'Shankarpally@9870'; // Use bcrypt to hash the password
+const defaultPassword = 'Shankarpally@9870'; // Unhashed default password
 
 // Middleware to check authentication
 const ensureAuthenticated = (req, res, next) => {
@@ -73,8 +78,11 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    // Check username and password against default credentials
-    if (username === defaultUsername && password === defaultPassword) {
+    // Hash the default password inside the login route
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+    // Check username and compare hashed password
+    if (username === defaultUsername && await bcrypt.compare(password, hashedPassword)) {
         req.session.loggedIn = true;
         req.session.username = username;
         return res.redirect('/LCbox.html'); // Redirect to LCbox.html upon successful login
@@ -94,12 +102,11 @@ app.get('/logout', (req, res) => {
 });
 
 // Protected route for LCbox.html
-// Protected route for LCbox.html
 app.get('/LCbox.html', ensureAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
 });
 
-// Routes
+// Routes to handle CRUD for Feeders
 app.get('/feeders', async (req, res) => {
     try {
         const feeders = await Feeder.find();
@@ -148,9 +155,14 @@ app.delete('/feeders/:id', async (req, res) => {
 // General error handler
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Something went wrong!');
+    if (process.env.NODE_ENV === 'development') {
+        res.status(500).send(`Error: ${err.message}`);
+    } else {
+        res.status(500).send('Something went wrong! Please try again later.');
+    }
 });
 
+// Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}/`);
 });
