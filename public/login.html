@@ -11,8 +11,6 @@
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             display: flex;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
             height: 100vh;
             margin: 0;
@@ -57,13 +55,8 @@
         .navbar {
             display: flex;
             justify-content: center;
-            margin-top: 70px;
-            background-color: transparent;
-            position: fixed;
-            top: 80px; /* Adjust based on the height of the header */
-            left: 0;
-            width: 100%;
-            z-index: 1000;
+            margin-top: 100px; /* Adjust this value based on the height of your header */
+            margin-bottom: 20px;
         }
 
         .navbar a {
@@ -90,8 +83,9 @@
             box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
             text-align: center;
             width: 350px;
-            margin-top: 170px; /* Adjust based on the height of the header and navbar */
+            transform: translateY(-50px);
             animation: slideIn 1s forwards;
+            margin-top: 20px; /* Adjust this if needed */
         }
 
         @keyframes slideIn {
@@ -183,7 +177,6 @@
             margin-top: 15px;
             display: none;
         }
-
     </style>
 </head>
 <body>
