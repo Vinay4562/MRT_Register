@@ -52,24 +52,18 @@ const Feeder = mongoose.model('Feeder', feederSchema);
 const defaultUsername = 'Shankarpally400kv';
 const defaultPassword = 'Shankarpally@9870'; // Use bcrypt to hash the password
 
-// Middleware to check authentication
-const ensureAuthenticated = (req, res, next) => {
-    if (req.session.loggedIn) {
-        return next();
-    }
-    res.redirect('/login');
-};
 
 // Route to render login page
 app.get('/login', (req, res) => {
     if (req.session.loggedIn) {
         res.redirect('/LCbox.html'); // Redirect if already logged in
     } else {
-        res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
+        res.sendFile(path.join(__dirname, 'public', 'login.html'));
     }
 });
 
-// Route to handle login
+const hashedPassword = bcrypt.hashSync('Shankarpally@9870', 10);
+
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -93,8 +87,12 @@ app.get('/logout', (req, res) => {
 });
 
 // Protected route for LCbox.html
-app.get('/LCbox.html', ensureAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
+app.get('/LCbox.html', (req, res) => {
+    if (req.session.loggedIn) {
+        res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
+    } else {
+        res.redirect('/login');
+    }
 });
 
 // Routes
