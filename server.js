@@ -65,7 +65,7 @@ app.get('/login', (req, res) => {
     if (req.session.loggedIn) {
         res.redirect('/LCbox.html'); // Redirect if already logged in
     } else {
-        res.sendFile(path.join(__dirname, 'public', 'login.html'));
+        res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
     }
 });
 
