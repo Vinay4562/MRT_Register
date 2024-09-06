@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
@@ -52,16 +52,6 @@ const Feeder = mongoose.model('Feeder', feederSchema);
 const defaultUsername = 'Shankarpally400kv';
 const defaultPassword = 'Shankarpally@9870'; // Use bcrypt to hash the password
 
-const hashedPassword = bcrypt.hashSync('Shankarpally@9870', 10);
-
-// Middleware to check authentication
-const ensureAuthenticated = (req, res, next) => {
-    if (req.session.loggedIn) {
-        return next();
-    }
-    res.redirect('/login');
-};
-
 // Route to render login page
 app.get('/login', (req, res) => {
     if (req.session.loggedIn) {
@@ -75,10 +65,11 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
+    // Check username and password against default credentials
+    if (username === defaultUsername && password === defaultPassword) {
         req.session.loggedIn = true;
         req.session.username = username;
-        return res.redirect('/LCbox.html');
+        return res.redirect('/LCbox.html'); // Redirect to LCbox.html upon successful login
     }
 
     res.status(401).send('Invalid credentials. <a href="/login">Try again</a>');
@@ -95,12 +86,16 @@ app.get('/logout', (req, res) => {
 });
 
 // Protected route for LCbox.html
-app.get('/LCbox.html', ensureAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
+app.get('/LCbox.html', (req, res) => {
+    if (req.session.loggedIn) {
+        res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
+    } else {
+        res.redirect('/login');
+    }
 });
 
-// Routes for feeders
-app.get('/feeders', ensureAuthenticated, async (req, res) => {
+// Routes
+app.get('/feeders', async (req, res) => {
     try {
         const feeders = await Feeder.find();
         res.json(feeders);
@@ -109,7 +104,7 @@ app.get('/feeders', ensureAuthenticated, async (req, res) => {
     }
 });
 
-app.post('/feeders', ensureAuthenticated, async (req, res) => {
+app.post('/feeders', async (req, res) => {
     const feeder = new Feeder(req.body);
     try {
         await feeder.save();
@@ -119,7 +114,7 @@ app.post('/feeders', ensureAuthenticated, async (req, res) => {
     }
 });
 
-app.put('/feeders/:id', ensureAuthenticated, async (req, res) => {
+app.put('/feeders/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const updatedFeeder = await Feeder.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
@@ -132,7 +127,7 @@ app.put('/feeders/:id', ensureAuthenticated, async (req, res) => {
     }
 });
 
-app.delete('/feeders/:id', ensureAuthenticated, async (req, res) => {
+app.delete('/feeders/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const feeder = await Feeder.findByIdAndDelete(id);
