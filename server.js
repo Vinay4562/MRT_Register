@@ -52,11 +52,18 @@ const Feeder = mongoose.model('Feeder', feederSchema);
 const defaultUsername = 'Shankarpally400kv';
 const defaultPassword = 'Shankarpally@9870'; // Use bcrypt to hash the password
 
+app.get('/api/check-auth', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.status(200).json({ authenticated: true });
+    } else {
+        res.status(401).json({ authenticated: false });
+    }
+});
 
 // Route to render login page
 app.get('/login', (req, res) => {
     if (req.session.loggedIn) {
-        res.redirect('/LCbox.html'); // Redirect if already logged in
+        res.redirect('/MRTregister.html'); // Redirect if already logged in
     } else {
         res.sendFile(path.join(__dirname, 'public', 'login.html'));
     }
@@ -70,7 +77,7 @@ app.post('/login', async (req, res) => {
     if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
         req.session.loggedIn = true;
         req.session.username = username;
-        return res.redirect('/LCbox.html');
+        return res.redirect('/MRTregister.html');
     }
 
     res.status(401).send('Invalid credentials. <a href="/login">Try again</a>');
@@ -86,10 +93,10 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// Protected route for LCbox.html
-app.get('/LCbox.html', (req, res) => {
+// Protected route for MRTregister.html
+app.get('/MRTregister.html', (req, res) => {
     if (req.session.loggedIn) {
-        res.sendFile(path.join(__dirname, 'public', 'LCbox.html'));
+        res.sendFile(path.join(__dirname, 'public', 'MRTregister.html'));
     } else {
         res.redirect('/login');
     }

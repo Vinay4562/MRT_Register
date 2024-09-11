@@ -245,6 +245,19 @@
             });
         });
 
+        window.onload = function() {
+            fetch('https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/api/check-auth') // Create an endpoint to check if the user is authenticated
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '/login.html'; // Redirect to login page if not authenticated
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    window.location.href = '/login.html';
+                });
+        };
+
         function preventBack() {
             window.history.forward();
         }
