@@ -246,23 +246,24 @@
         });
 
         window.onload = function() {
-            fetch('https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/api/check-auth', {
-                    credentials: 'include' // This sends the session cookie with the request
-                })
-                .then(response => {
-                    if (response.status === 401) {
-                        window.location.href = '/login.html'; // Redirect if not authenticated
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    window.location.href = '/login.html'; // Redirect on fetch error
-                });
-        };
+            fetchData(); // Fetch and display the feeders
 
-        function preventBack() {
-            window.history.forward();
-        }
+            // Check user authentication
+            fetch('https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/api/check-auth', {
+                credentials: 'include' // Include session cookie
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    window.location.href = '/login.html'; // Redirect if not authenticated
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.location.href = '/login.html'; // Redirect on fetch error
+            });
+
+            preventBack(); // Prevent back navigation
+        };
 
         setTimeout("preventBack()", 0);
         window.onunload = function () { null};
