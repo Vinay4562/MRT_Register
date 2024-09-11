@@ -5,6 +5,8 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const path = require('path');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 require('dotenv').config();
 
 const app = express();
@@ -26,7 +28,10 @@ db.once('open', () => {
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors({ origin: 'http://400kvssshankarpally.free.nf' })); // Replace with your frontend domain
+app.use(cors({
+    origin: ['http://400kvssshankarpally.free.nf', 'https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app'],
+    credentials: true
+}));
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' folder
 
 // Session Middleware
@@ -36,6 +41,28 @@ app.use(session({
     saveUninitialized: false,
     cookie: { maxAge: 60000 } // session will expire in 60 seconds (for testing)
 }));
+
+// Passport configuration
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(
+    (username, password, done) => {
+        if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
+            return done(null, { username });
+        } else {
+            return done(null, false, { message: 'Invalid credentials' });
+        }
+    }
+));
+
+passport.serializeUser((user, done) => {
+    done(null, user.username);
+});
+
+passport.deserializeUser((username, done) => {
+    done(null, { username });
+});
 
 // Define schema and model
 const feederSchema = new mongoose.Schema({
@@ -53,7 +80,7 @@ const defaultUsername = 'Shankarpally400kv';
 const defaultPassword = 'Shankarpally@9870'; // Use bcrypt to hash the password
 
 app.get('/api/check-auth', (req, res) => {
-    if (req.isAuthenticated()) {
+    if (req.session.loggedIn) {
         res.status(200).json({ authenticated: true });
     } else {
         res.status(401).json({ authenticated: false });
