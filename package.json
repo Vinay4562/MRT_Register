@@ -21,6 +21,8 @@
     "express-session": "^1.18.0",
     "express-validator": "^7.1.0",
     "mongoose": "^8.6.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
     "pm2": "^5.4.2"
   },
   "engines": {
