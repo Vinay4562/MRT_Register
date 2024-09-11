@@ -254,6 +254,12 @@
             });
         });
 
+        // Define the preventBack function
+        function preventBack() {
+            window.history.forward();
+        }
+
+        // On page load
         window.onload = function() {
             fetchData(); // Fetch and display the feeders
 
@@ -271,11 +277,18 @@
                 window.location.href = '/login.html'; // Redirect on fetch error
             });
 
-            preventBack(); // Prevent back navigation
+            preventBack(); // Prevent back navigation after the page is loaded
         };
 
-        setTimeout("preventBack()", 0);
-        window.onunload = function () { null};
+        // Set timeout to prevent back navigation immediately on page load
+        setTimeout(function() {
+            preventBack();
+        }, 0);
+
+        // Block back navigation when the page is unloaded
+        window.onunload = function () {
+            null;
+        };
     </script>
 </body>
 </html>
