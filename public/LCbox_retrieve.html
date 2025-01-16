@@ -180,10 +180,10 @@
 
     <!-- Filter Buttons -->
     <div class="filter-buttons">
-        <button onclick="filterByStatus('all')">All</button>
-        <button onclick="filterByStatus('completed')">Completed</button>
-        <button onclick="filterByStatus('incomplete')">Incomplete</button>
-        <button onclick="filterByStatus('pending')">Pending</button>
+        <button onclick="filterByStatus('all')">All (<span id="all-count">0</span>)</button>
+        <button onclick="filterByStatus('completed')">Completed (<span id="completed-count">0</span>)</button>
+        <button onclick="filterByStatus('incomplete')">Incomplete (<span id="incomplete-count">0</span>)</button>
+        <button onclick="filterByStatus('pending')">Pending (<span id="pending-count">0</span>)</button>
     </div>
 
     <!-- Search Box -->
@@ -262,6 +262,33 @@
             cell6.textContent = data.remarks;
         }
 
+        function updateCounts() {
+            const table = document.getElementById("displayTableBody");
+            const rows = table.getElementsByTagName("tr");
+
+            let allCount = 0;
+            let completedCount = 0;
+            let incompleteCount = 0;
+            let pendingCount = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                const statusCell = rows[i].getElementsByClassName("status-cell")[0];
+                if (statusCell) {
+                    const rowStatus = statusCell.className.split(" ")[1].replace("-status", "");
+
+                    allCount++;
+                    if (rowStatus === 'completed') completedCount++;
+                    if (rowStatus === 'incomplete') incompleteCount++;
+                    if (rowStatus === 'pending') pendingCount++;
+                }
+            }
+
+            document.getElementById("all-count").textContent = allCount;
+            document.getElementById("completed-count").textContent = completedCount;
+            document.getElementById("incomplete-count").textContent = incompleteCount;
+            document.getElementById("pending-count").textContent = pendingCount;
+        }
+
         function filterByStatus(status) {
             const table = document.getElementById("displayTableBody");
             const rows = table.getElementsByTagName("tr");
@@ -278,7 +305,14 @@
                     }
                 }
             }
+
+            // Update counts after filtering
+            updateCounts();
         }
+
+        // Call updateCounts when the page loads or data changes
+        document.addEventListener("DOMContentLoaded", updateCounts);
+
 
         document.getElementById("searchInput").addEventListener("input", function () {
             searchData();
