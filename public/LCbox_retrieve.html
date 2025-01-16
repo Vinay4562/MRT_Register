@@ -88,6 +88,32 @@
             color: #fff;
         }
 
+        .filter-buttons {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .filter-buttons button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .filter-buttons button:hover {
+            background-color: #2ecc71;
+        }
+
+        .filter-buttons button:active {
+            background-color: #1abc9c;
+        }
+
         /* Search Box Styling */
         .search-box {
             margin-top: 20px;
@@ -150,6 +176,14 @@
      <!-- Loader -->
      <div id="loader" class="loader-container">
         <div class="loader"></div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="filter-buttons">
+        <button onclick="filterByStatus('all')">All</button>
+        <button onclick="filterByStatus('completed')">Completed</button>
+        <button onclick="filterByStatus('incomplete')">Incomplete</button>
+        <button onclick="filterByStatus('pending')">Pending</button>
     </div>
 
     <!-- Search Box -->
@@ -226,6 +260,24 @@
 
             const cell6 = newRow.insertCell(5);
             cell6.textContent = data.remarks;
+        }
+
+        function filterByStatus(status) {
+            const table = document.getElementById("displayTableBody");
+            const rows = table.getElementsByTagName("tr");
+
+            for (let i = 0; i < rows.length; i++) {
+                const statusCell = rows[i].getElementsByClassName("status-cell")[0];
+                if (statusCell) {
+                    const rowStatus = statusCell.className.split(" ")[1].replace("-status", "");
+
+                    if (status === 'all' || rowStatus === status) {
+                        rows[i].style.display = ""; // Show row
+                    } else {
+                        rows[i].style.display = "none"; // Hide row
+                    }
+                }
+            }
         }
 
         document.getElementById("searchInput").addEventListener("input", function () {
