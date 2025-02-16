@@ -130,18 +130,19 @@ body {
 }
 
 .popup {
-    display: none;
     position: fixed;
     top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: green;
+    right: 20px;
+    padding: 15px;
+    background: #4CAF50;
     color: white;
-    padding: 15px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
+    border-radius: 4px;
+    display: none;
     z-index: 1000;
+}
+
+.popup.error {
+    background: #f44336;
 }
 
 /* Modal */

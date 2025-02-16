@@ -232,6 +232,18 @@
 
             fetchData(); // Load data when the page loads
 
+        // Add this function at the top of your script
+        function showPopup(message, isError = false) {
+            const popup = document.getElementById("successPopup");
+            popup.textContent = message;
+            popup.className = "popup" + (isError ? " error" : "");
+            popup.style.display = "block";
+            
+            setTimeout(() => {
+                popup.style.display = "none";
+            }, 1500);
+        }
+
         function updateSerialNumbers() {
             const rows = document.querySelectorAll("#data-table tbody tr");
             rows.forEach((row, index) => {
