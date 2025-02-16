@@ -87,11 +87,9 @@
         const closeButton = document.querySelector(".close-button");
         const editForm = document.querySelector("#edit-form");
         const dataTable = document.querySelector("#data-table tbody");
-
-        let serialCounter = 1;
         let currentEditId = null;
 
-        const formatDate = (date) => moment(date).format("DD-MM-YYYY"); // ✅ Change to DD-MM-YYYY
+        const formatDate = (date) => moment(date).format("DD-MM-YYYY");
 
         const applyStatusClass = (status) => {
             return status ? status.toLowerCase().replace(/\s/g, "-") + "-status" : "";
@@ -106,9 +104,9 @@
                 if (!response.ok) throw new Error("Network response was not ok");
 
                 const data = await response.json();
-                console.log("Fetched data:", data); // Debug log
+                console.log("Fetched data:", data);
 
-                dataTable.innerHTML = ""; // Clear table first
+                dataTable.innerHTML = "";
 
                 if (data.length > 0) {
                     data.forEach((feeder, index) => {
@@ -136,8 +134,8 @@
         };
 
         addButton.addEventListener("click", () => {
-            currentEditId = null; // Reset edit ID
-            editForm.reset(); // Clear form
+            currentEditId = null;
+            editForm.reset();
             modalOverlay.style.display = "flex";
         });
 
@@ -152,7 +150,7 @@
 
             try {
                 let response;
-                let isEditing = !!currentEditId; // Check if we are editing
+                let isEditing = !!currentEditId;
 
                 if (isEditing) {
                     response = await fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${currentEditId}`, {
@@ -169,8 +167,7 @@
                 }
 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Network response was not ok: ${response.status} ${errorText}`);
+                    throw new Error(`Network response was not ok: ${response.status}`);
                 }
 
                 const data = await response.json();
@@ -179,7 +176,6 @@
                 }
 
                 if (isEditing) {
-                    // **Update existing row**
                     const row = document.querySelector(`tr[data-id="${currentEditId}"]`);
                     if (row) {
                         row.cells[1].textContent = data.feederName || "N/A";
@@ -190,23 +186,13 @@
                     }
                     showPopup("Data modified successfully");
                 } else {
-                    // **Find last serial number correctly**
                     let lastSerialNumber = 0;
-                    const rows = document.querySelectorAll("#dataTable tr:not(:first-child)"); // Exclude header row
-
+                    const rows = document.querySelectorAll("#data-table tbody tr");
                     if (rows.length > 0) {
-                        const lastRow = rows[rows.length - 1];
-                        const lastSerial = parseInt(lastRow.cells[0].textContent, 10);
-                        lastSerialNumber = isNaN(lastSerial) ? 0 : lastSerial; // Ensure valid number
+                        lastSerialNumber = Math.max(...Array.from(rows).map(row => parseInt(row.cells[0].textContent, 10) || 0));
                     }
                     const newSerialNumber = lastSerialNumber + 1;
 
-                    if (!dataTable) {
-                        console.error("dataTable element not found.");
-                        return;
-                    }
-
-                    // Create new row with incremented serial number
                     const newRow = document.createElement("tr");
                     newRow.dataset.id = data._id;
                     newRow.innerHTML = `
@@ -229,31 +215,17 @@
             }
         });
 
-        /** Function to show a popup message **/
         function showPopup(message) {
             const popup = document.getElementById("successPopup");
             popup.textContent = message;
             popup.style.display = "block";
-            
-            // Hide popup after 1.5 seconds
             setTimeout(() => {
                 popup.style.display = "none";
             }, 1500);
         }
 
         document.addEventListener("click", (e) => {
-            if (e.target.classList.contains("edit-button")) {
-                const row = e.target.closest("tr");
-                currentEditId = row.dataset.id;
-
-                document.querySelector("#feeder-name").value = row.cells[1].textContent;
-                document.querySelector("#last-tested-date").value = moment(row.cells[2].textContent, "DD-MM-YYYY").format("YYYY-MM-DD");
-                document.querySelector("#scheduled-date").value = moment(row.cells[3].textContent, "DD-MM-YYYY").format("YYYY-MM-DD");
-                document.querySelector("#status").value = row.cells[4].textContent;
-                document.querySelector("#remarks").value = row.cells[5].textContent;
-
-                modalOverlay.style.display = "flex";
-            } else if (e.target.classList.contains("delete-button")) {
+            if (e.target.classList.contains("delete-button")) {
                 const row = e.target.closest("tr");
                 const id = row.dataset.id;
 
@@ -263,12 +235,23 @@
                     })
                         .then((response) => {
                             if (!response.ok) throw new Error("Network response was not ok");
+                            return response.json();
+                        })
+                        .then(() => {
                             row.remove();
+                            updateSerialNumbers();
                         })
                         .catch((error) => console.error("Delete error:", error));
                 }
             }
         });
+
+        function updateSerialNumbers() {
+            const rows = document.querySelectorAll("#data-table tbody tr");
+            rows.forEach((row, index) => {
+                row.cells[0].textContent = index + 1;
+            });
+        }
 
         const preventBack = () => {
             window.history.forward();
