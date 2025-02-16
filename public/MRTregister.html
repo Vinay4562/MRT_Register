@@ -89,7 +89,7 @@
         let serialCounter = 1;
         let currentEditId = null;
 
-        const formatDate = (date) => moment(date).format("YYYY-MM-DD");
+        const formatDate = (date) => moment(date).format("DD-MM-YYYY"); // ✅ Change to DD-MM-YYYY
 
         const applyStatusClass = (status) => {
             return status ? status.toLowerCase().replace(/\s/g, "-") + "-status" : "";
@@ -206,8 +206,8 @@
                 currentEditId = row.dataset.id;
 
                 document.querySelector("#feeder-name").value = row.cells[1].textContent;
-                document.querySelector("#last-tested-date").value = moment(row.cells[2].textContent).format("YYYY-MM-DD");
-                document.querySelector("#scheduled-date").value = moment(row.cells[3].textContent).format("YYYY-MM-DD");
+                document.querySelector("#last-tested-date").value = moment(row.cells[2].textContent, "DD-MM-YYYY").format("YYYY-MM-DD");
+                document.querySelector("#scheduled-date").value = moment(row.cells[3].textContent, "DD-MM-YYYY").format("YYYY-MM-DD");
                 document.querySelector("#status").value = row.cells[4].textContent;
                 document.querySelector("#remarks").value = row.cells[5].textContent;
 
@@ -262,7 +262,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.message === "Logged out successfully") {
-                    window.location.href = "/login"; // Redirect to login page
+                    window.location.href = "/login.html"; // Redirect to login page
                 } else {
                     alert("Error logging out");
                 }

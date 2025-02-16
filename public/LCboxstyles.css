@@ -23,8 +23,11 @@ body {
 }
 
 .logo {
-    width: 150px;
-    height: auto;
+    width: 130px;
+    height: 100px;
+    background-color: white; /* Set background color to white */
+    padding: 10px; /* Optional: Add some padding around the logo */
+    border-radius: 10px; /* Optional: Add rounded corners */
 }
 
 /* Navbar */
@@ -98,7 +101,7 @@ body {
 
 .pending-status {
     background-color: #FFA500;
-    color: black;
+    color: white;
     padding: 5px;
     border-radius: 4px;
     text-align: center;
@@ -106,7 +109,7 @@ body {
 
 .incomplete-status {
     background-color: #FF4500;
-    color: black;
+    color: white;
     padding: 5px;
     border-radius: 4px;
     text-align: center;
@@ -114,7 +117,7 @@ body {
 
 .completed-status {
     background-color: #28A745;
-    color: black;
+    color: white;
     padding: 5px;
     border-radius: 4px;
     text-align: center;
