@@ -39,7 +39,11 @@ app.use(session({
     secret: 'mysecretkey',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60000 } // session will expire in 60 seconds (for testing)
+    cookie: {
+        maxAge: 1000 * 60 * 60, // 1 hour session
+        httpOnly: true, // Prevent access via JavaScript
+        secure: false // Set to true if using HTTPS
+    }
 }));
 
 // Passport configuration
@@ -112,8 +116,11 @@ app.post('/login', async (req, res) => {
 
 // Route to handle logout
 app.post("/logout", (req, res) => {
-    res.clearCookie("sessionToken"); // Clear authentication cookie (if applicable)
-    req.session.destroy(() => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ message: "Logout failed" });
+        }
+        res.clearCookie("connect.sid"); // Clear session cookie
         res.status(200).json({ message: "Logged out successfully" });
     });
 });
