@@ -255,22 +255,22 @@
         window.addEventListener("popstate", preventBack);
 
         document.getElementById("logoutButton").addEventListener("click", function () {
-            fetch("https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/api/logout", { // Use correct API path
+            fetch("/logout", {
                 method: "POST",
-                credentials: "include",
+                credentials: "include"
             })
-            .then((response) => {
-                if (response.ok) {
-                    window.location.href = "/login.html"; // Redirect to login page
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Logged out successfully") {
+                    window.location.href = "/login"; // Redirect to login page
                 } else {
                     alert("Error logging out");
                 }
             })
-            .catch((error) => {
+            .catch(error => {
                 console.error("Error during logout:", error);
             });
         });
-
     });
 </script>
 </body>
