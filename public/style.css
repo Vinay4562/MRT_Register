@@ -20,6 +20,7 @@ body {
 
 .logo {
     margin-right: 15px;
+    background: transparent;
 }
 
 /* Navigation Bar */
