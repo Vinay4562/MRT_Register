@@ -96,6 +96,31 @@ body {
     background: #ff4d4d;
 }
 
+.pending-status {
+    background-color: #FFA500;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.incomplete-status {
+    background-color: #FF4500;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.completed-status {
+    background-color: #28A745;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+
 /* Modal */
 .modal-overlay {
     display: none;
