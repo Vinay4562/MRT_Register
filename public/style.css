@@ -36,6 +36,17 @@ body{
     font-size: 30px;
 }
 
+/* Footer Section */
+.footer {
+    background-color: #007bff;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    bottom: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure the footer is above other elements */
+}
+
 .navbar {
     background-color: white;
     overflow: hidden;
