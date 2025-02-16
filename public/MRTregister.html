@@ -224,24 +224,41 @@
             }, 1500);
         }
 
-        document.addEventListener("click", (e) => {
+        document.addEventListener("click", async (e) => {
             if (e.target.classList.contains("delete-button")) {
                 const row = e.target.closest("tr");
                 const id = row.dataset.id;
 
                 if (confirm("Are you sure you want to delete this item?")) {
-                    fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${id}`, {
-                        method: "DELETE",
-                    })
-                        .then((response) => {
-                            if (!response.ok) throw new Error("Network response was not ok");
-                            return response.json();
-                        })
-                        .then(() => {
-                            row.remove();
-                            updateSerialNumbers();
-                        })
-                        .catch((error) => console.error("Delete error:", error));
+                    try {
+                        const response = await fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${id}`, {
+                            method: "DELETE",
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`Failed to delete: ${response.status} ${response.statusText}`);
+                        }
+
+                        // ✅ Check if there is a response body
+                        const text = await response.text();
+                        if (text) {
+                            console.log("Server response:", text); // Debugging
+                            try {
+                                const data = JSON.parse(text);
+                                console.log("Parsed JSON:", data);
+                            } catch (jsonError) {
+                                console.warn("Response is not JSON, but deletion was successful.");
+                            }
+                        } else {
+                            console.warn("Empty response, assuming deletion successful.");
+                        }
+
+                        // ✅ Remove row from UI
+                        row.remove();
+
+                    } catch (error) {
+                        console.error("Delete error:", error);
+                    }
                 }
             }
         });
