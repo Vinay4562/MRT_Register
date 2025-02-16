@@ -1,131 +1,138 @@
-/* Blue and White Theme with Animations */
+/* General Styles */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg, #007bff, #ffffff);
     margin: 0;
     padding: 0;
-    background: linear-gradient(to right, #e6f2ff, #ffffff);
-    color: #003366;
     text-align: center;
 }
 
+/* Header */
 .header {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    background: #0056b3;
+    color: white;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-in-out;
 }
 
 .logo {
-    width: 130px;
-    height: 100px;
-    object-fit: contain;
+    margin-right: 20px;
 }
 
-h1 {
-    font-size: 24px;
-    margin-left: 10px;
-    text-transform: uppercase;
-    animation: fadeIn 1.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
+/* Navigation Bar */
 .navbar {
     display: flex;
     justify-content: center;
     background: #003366;
-    padding: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 10px 0;
 }
 
 .navbar a {
     color: white;
     text-decoration: none;
-    padding: 10px 20px;
-    transition: 0.3s;
+    padding: 12px 20px;
+    font-size: 18px;
+    transition: all 0.3s ease;
 }
 
 .navbar a:hover {
-    background: #005bb5;
+    background: white;
+    color: #003366;
     border-radius: 5px;
 }
 
-.filter-buttons button {
-    background: #005bb5;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    margin: 5px;
-    cursor: pointer;
-    transition: 0.3s;
-    border-radius: 5px;
-}
-
-.filter-buttons button:hover {
-    background: #003366;
-}
-
-.search-box {
+/* Loader Animation */
+.loader-container {
     display: flex;
     justify-content: center;
-    margin: 20px;
+    margin-top: 20px;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-top: 5px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Search Box */
+.search-box {
+    margin: 20px auto;
+    width: 50%;
+    display: flex;
+    justify-content: center;
 }
 
 .search-input {
-    width: 50%;
+    width: 100%;
     padding: 10px;
-    border: 2px solid #005bb5;
+    border: 2px solid #007bff;
     border-radius: 5px;
-    transition: 0.3s;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
 .search-input:focus {
-    border-color: #003366;
-    outline: none;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
+/* Table */
 table {
     width: 90%;
-    margin: auto;
+    margin: 20px auto;
     border-collapse: collapse;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-in-out;
 }
 
 table th, table td {
-    border: 1px solid #003366;
-    padding: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    text-align: center;
 }
 
 table th {
-    background: #005bb5;
+    background: #007bff;
     color: white;
 }
 
-.status-cell {
-    font-weight: bold;
-    text-transform: capitalize;
+table tbody tr:hover {
+    background: rgba(0, 123, 255, 0.1);
+    transition: 0.3s;
 }
 
-.completed-status {
-    color: green;
-}
+/* Status Colors */
+.completed-status { color: green; font-weight: bold; }
+.incomplete-status { color: orange; font-weight: bold; }
+.pending-status { color: red; font-weight: bold; }
 
-.incomplete-status {
-    color: orange;
-}
-
-.pending-status {
-    color: red;
-}
-
+/* Footer */
 .footer {
     background: #003366;
     color: white;
-    padding: 10px;
-    position: absolute;
-    width: 100%;
-    bottom: 0;
+    padding: 15px;
+    margin-top: 20px;
+    text-align: center;
+    animation: fadeIn 2s ease-in-out;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
