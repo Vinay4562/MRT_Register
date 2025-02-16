@@ -132,7 +132,7 @@ app.get('/MRTregister.html', (req, res) => {
 // Routes
 app.get('/feeders', async (req, res) => {
     try {
-        const feeders = await Feeder.find();
+        const feeders = await Feeder.find({}, 'feederName lastTestedDate scheduledDate status remarks'); 
         res.json(feeders);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -140,14 +140,28 @@ app.get('/feeders', async (req, res) => {
 });
 
 app.post('/feeders', async (req, res) => {
-    const feeder = new Feeder(req.body);
     try {
+        const { feederName, lastTestedDate, scheduledDate, status, remarks } = req.body;
+        
+        if (!feederName || !lastTestedDate || !scheduledDate || !status) {
+            return res.status(400).json({ message: "All required fields must be provided!" });
+        }
+
+        const feeder = new Feeder({
+            feederName,
+            lastTestedDate: new Date(lastTestedDate),  // Ensure valid date format
+            scheduledDate: new Date(scheduledDate),
+            status,
+            remarks
+        });
+
         await feeder.save();
         res.status(201).json(feeder);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
+
 
 app.put('/feeders/:id', async (req, res) => {
     const { id } = req.params;
