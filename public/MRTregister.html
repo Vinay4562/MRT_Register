@@ -78,6 +78,8 @@
         </div>
     </div>
 
+    <div id="successPopup" class="popup"></div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
         const addButton = document.querySelector(".add-button");
@@ -150,7 +152,9 @@
 
             try {
                 let response;
-                if (currentEditId) {
+                let isEditing = !!currentEditId; // Check if we are editing
+
+                if (isEditing) {
                     response = await fetch(`https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders/${currentEditId}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
@@ -170,28 +174,40 @@
                 }
 
                 const data = await response.json();
+                if (!data || !data._id) {
+                    throw new Error("Invalid response data");
+                }
 
-                if (currentEditId) {
+                if (isEditing) {
                     const row = document.querySelector(`tr[data-id="${currentEditId}"]`);
-                    row.cells[1].textContent = data.feederName;
-                    row.cells[2].textContent = formatDate(data.lastTestedDate);
-                    row.cells[3].textContent = formatDate(data.scheduledDate);
-                    row.cells[4].textContent = data.status;
-                    row.cells[5].textContent = data.remarks;
+                    if (row) {
+                        row.cells[1].textContent = data.feederName || "N/A";
+                        row.cells[2].textContent = formatDate(data.lastTestedDate);
+                        row.cells[3].textContent = formatDate(data.scheduledDate);
+                        row.cells[4].textContent = data.status || "N/A";
+                        row.cells[5].textContent = data.remarks || "N/A";
+                    }
+                    showPopup("Data modified successfully");
                 } else {
+                    if (!dataTable) {
+                        console.error("dataTable element not found.");
+                        return;
+                    }
+
                     const newRow = document.createElement("tr");
                     newRow.dataset.id = data._id;
                     newRow.innerHTML = `
                         <td>${serialCounter++}</td>
-                        <td>${data.feederName}</td>
+                        <td>${data.feederName || "N/A"}</td>
                         <td>${formatDate(data.lastTestedDate)}</td>
                         <td>${formatDate(data.scheduledDate)}</td>
-                        <td class="${applyStatusClass(data.status)}">${data.status}</td>
-                        <td>${data.remarks}</td>
+                        <td class="${applyStatusClass(data.status)}">${data.status || "N/A"}</td>
+                        <td>${data.remarks || "N/A"}</td>
                         <td><button class="edit-button">Edit</button></td>
                         <td><button class="delete-button">Delete</button></td>
                     `;
                     dataTable.appendChild(newRow);
+                    showPopup("Feeder Added Successfully");
                 }
 
                 modalOverlay.style.display = "none";
@@ -199,6 +215,18 @@
                 console.error("Submit error:", error);
             }
         });
+
+        /** Function to show a popup message **/
+        function showPopup(message) {
+            const popup = document.getElementById("successPopup");
+            popup.textContent = message;
+            popup.style.display = "block";
+            
+            // Hide popup after 1.5 seconds
+            setTimeout(() => {
+                popup.style.display = "none";
+            }, 1500);
+        }
 
         document.addEventListener("click", (e) => {
             if (e.target.classList.contains("edit-button")) {

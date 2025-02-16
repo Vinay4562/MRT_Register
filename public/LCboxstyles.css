@@ -129,6 +129,21 @@ body {
     display: inline-block;
 }
 
+.popup {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: green;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 1000;
+}
+
 /* Modal */
 .modal-overlay {
     display: none;
