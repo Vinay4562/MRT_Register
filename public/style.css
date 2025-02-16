@@ -22,11 +22,15 @@ body {
     animation: slideDown 1s ease-in-out;
 }
 
+/* Logo styling */
 .logo {
-    border-radius: 10px;
-    transition: transform 0.3s ease-in-out;
-    background-color: none;
+    width: 100px; /* Adjust size as needed */
+    margin-right: 20px;
+    background-color: white; /* Remove background color */
+    position: absolute;
+    left: 20px; /* Align logo to the left side of the header */
 }
+
 .logo:hover {
     transform: scale(1.1);
 }
