@@ -100,29 +100,34 @@ body {
 }
 
 .pending-status {
-    background-color: #FFA500;
-    color: white;
-    padding: 5px;
+    background-color: #FFC107 !important; /* Brighter yellow */
+    color: white !important;
+    padding: 6px 10px;
     border-radius: 4px;
     text-align: center;
+    font-weight: bold;
+    display: inline-block;
 }
 
 .incomplete-status {
-    background-color: #FF4500;
-    color: white;
-    padding: 5px;
+    background-color: #DC3545 !important; /* Bootstrap Red */
+    color: white !important;
+    padding: 6px 10px;
     border-radius: 4px;
     text-align: center;
+    font-weight: bold;
+    display: inline-block;
 }
 
 .completed-status {
-    background-color: #28A745;
-    color: white;
-    padding: 5px;
+    background-color: #28A745 !important; /* Green */
+    color: white !important;
+    padding: 6px 10px;
     border-radius: 4px;
     text-align: center;
+    font-weight: bold;
+    display: inline-block;
 }
-
 
 /* Modal */
 .modal-overlay {
