@@ -180,3 +180,97 @@ tr:nth-child(even) {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+        padding: 0;
+    }
+
+    /* Header */
+    .header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .logo {
+        width: 100px;
+        height: 80px;
+    }
+
+    /* Navbar */
+    .navbar {
+        flex-direction: column;
+        padding: 5px 0;
+        gap: 5px;
+    }
+
+    .navbar a {
+        font-size: 16px;
+        padding: 8px 12px;
+    }
+
+    /* Table */
+    table {
+        width: 100%;
+        font-size: 14px;
+        overflow-x: auto;
+        display: block;
+    }
+
+    thead {
+        display: none; /* Hide table headers on small screens */
+    }
+
+    tr {
+        display: block;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    td {
+        display: block;
+        text-align: left;
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    td::before {
+        font-weight: bold;
+        color: #004aad;
+    }
+
+    /* Search Box */
+    .search-box {
+        width: 90%;
+    }
+
+    .search-input {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    /* Buttons */
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .filter-buttons button {
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+
+    /* Footer */
+    .footer {
+        font-size: 14px;
+        padding: 8px 0;
+    }
+}
