@@ -1,9 +1,9 @@
-/* Animated Blue & White Theme CSS */
+/* Professional Animated Blue & White Theme CSS */
 
 body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(to right, #e0f7fa, #ffffff);
-    color: #004080;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #dff6ff, #ffffff);
+    color: #003366;
     margin: 0;
     padding: 0;
     text-align: center;
@@ -13,45 +13,43 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #004080;
+    background: #003366;
     color: white;
-    padding: 15px;
-    font-size: 1.5rem;
+    padding: 20px;
+    font-size: 2rem;
     font-weight: bold;
     text-transform: uppercase;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     animation: fadeIn 1s ease-in-out;
-}
-
-.logo {
-    margin-right: 20px;
 }
 
 .navbar {
     display: flex;
     justify-content: center;
-    background: #0074d9;
-    padding: 10px 0;
+    background: #005bb5;
+    padding: 15px 0;
     animation: slideDown 0.8s ease-in-out;
 }
 
 .navbar a {
     color: white;
     text-decoration: none;
-    padding: 10px 20px;
+    padding: 12px 25px;
+    font-size: 1.2rem;
     transition: background 0.3s, transform 0.3s;
     font-weight: bold;
-    border-radius: 5px;
+    border-radius: 8px;
 }
 
 .navbar a:hover {
-    background: #005bb5;
+    background: #004080;
     transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(0, 91, 181, 0.5);
 }
 
 h2 {
     margin-top: 20px;
-    font-size: 2rem;
+    font-size: 2.5rem;
     text-transform: uppercase;
     font-weight: bold;
     animation: fadeInUp 1s ease-in-out;
@@ -65,11 +63,11 @@ h2 {
 }
 
 .loader {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #0074d9;
+    border: 10px solid #f3f3f3;
+    border-top: 10px solid #005bb5;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     animation: spin 1s linear infinite;
 }
 
@@ -81,16 +79,16 @@ h2 {
 }
 
 .search-input {
-    padding: 10px;
+    padding: 12px;
     width: 100%;
-    font-size: 1rem;
-    border: 2px solid #0074d9;
-    border-radius: 5px;
+    font-size: 1.2rem;
+    border: 2px solid #005bb5;
+    border-radius: 8px;
     transition: box-shadow 0.3s;
 }
 
 .search-input:focus {
-    box-shadow: 0 0 10px #0074d9;
+    box-shadow: 0 0 15px #005bb5;
     outline: none;
 }
 
@@ -98,38 +96,43 @@ table {
     width: 90%;
     margin: 20px auto;
     border-collapse: collapse;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     background: white;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 thead {
-    background: #004080;
+    background: #003366;
     color: white;
 }
 
 td, th {
-    padding: 12px;
+    padding: 15px;
     border: 1px solid #ddd;
     text-align: center;
+    font-size: 1.1rem;
 }
 
 tr:nth-child(even) {
-    background: #f2f2f2;
+    background: #e6f2ff;
 }
 
 tr:hover {
-    background: #d0e6ff;
+    background: #b3d9ff;
     transition: background 0.3s;
 }
 
 .footer {
-    background: #004080;
+    background: #003366;
     color: white;
-    padding: 10px;
+    padding: 15px;
+    font-size: 1rem;
     position: relative;
     bottom: 0;
     width: 100%;
     text-align: center;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Animations */
