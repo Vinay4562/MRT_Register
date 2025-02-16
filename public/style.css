@@ -1,21 +1,25 @@
-/* General Styles */
+/* Animated Blue & White Theme CSS */
+
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(120deg, #007bff, #ffffff);
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to right, #e0f7fa, #ffffff);
+    color: #004080;
     margin: 0;
     padding: 0;
     text-align: center;
 }
 
-/* Header */
 .header {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #0056b3;
+    background: #004080;
     color: white;
     padding: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     animation: fadeIn 1s ease-in-out;
 }
 
@@ -23,50 +27,52 @@ body {
     margin-right: 20px;
 }
 
-/* Navigation Bar */
 .navbar {
     display: flex;
     justify-content: center;
-    background: #003366;
+    background: #0074d9;
     padding: 10px 0;
+    animation: slideDown 0.8s ease-in-out;
 }
 
 .navbar a {
     color: white;
     text-decoration: none;
-    padding: 12px 20px;
-    font-size: 18px;
-    transition: all 0.3s ease;
-}
-
-.navbar a:hover {
-    background: white;
-    color: #003366;
+    padding: 10px 20px;
+    transition: background 0.3s, transform 0.3s;
+    font-weight: bold;
     border-radius: 5px;
 }
 
-/* Loader Animation */
+.navbar a:hover {
+    background: #005bb5;
+    transform: scale(1.1);
+}
+
+h2 {
+    margin-top: 20px;
+    font-size: 2rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    animation: fadeInUp 1s ease-in-out;
+}
+
 .loader-container {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    align-items: center;
+    height: 100vh;
 }
 
 .loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #0074d9;
+    border-radius: 50%;
     width: 50px;
     height: 50px;
-    border: 5px solid rgba(255, 255, 255, 0.3);
-    border-top: 5px solid #007bff;
-    border-radius: 50%;
     animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Search Box */
 .search-box {
     margin: 20px auto;
     width: 50%;
@@ -75,64 +81,74 @@ body {
 }
 
 .search-input {
-    width: 100%;
     padding: 10px;
-    border: 2px solid #007bff;
+    width: 100%;
+    font-size: 1rem;
+    border: 2px solid #0074d9;
     border-radius: 5px;
-    font-size: 16px;
-    outline: none;
-    transition: all 0.3s ease;
+    transition: box-shadow 0.3s;
 }
 
 .search-input:focus {
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    box-shadow: 0 0 10px #0074d9;
+    outline: none;
 }
 
-/* Table */
 table {
     width: 90%;
     margin: 20px auto;
     border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background: white;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 1s ease-in-out;
 }
 
-table th, table td {
-    padding: 15px;
+thead {
+    background: #004080;
+    color: white;
+}
+
+td, th {
+    padding: 12px;
     border: 1px solid #ddd;
     text-align: center;
 }
 
-table th {
-    background: #007bff;
-    color: white;
+tr:nth-child(even) {
+    background: #f2f2f2;
 }
 
-table tbody tr:hover {
-    background: rgba(0, 123, 255, 0.1);
-    transition: 0.3s;
+tr:hover {
+    background: #d0e6ff;
+    transition: background 0.3s;
 }
 
-/* Status Colors */
-.completed-status { color: green; font-weight: bold; }
-.incomplete-status { color: orange; font-weight: bold; }
-.pending-status { color: red; font-weight: bold; }
-
-/* Footer */
 .footer {
-    background: #003366;
+    background: #004080;
     color: white;
-    padding: 15px;
-    margin-top: 20px;
+    padding: 10px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
     text-align: center;
-    animation: fadeIn 2s ease-in-out;
 }
 
-/* Fade In Animation */
+/* Animations */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
 }
