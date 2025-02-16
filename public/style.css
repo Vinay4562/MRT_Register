@@ -25,6 +25,7 @@ body {
 .logo {
     border-radius: 10px;
     transition: transform 0.3s ease-in-out;
+    background-color: none;
 }
 .logo:hover {
     transform: scale(1.1);
@@ -82,6 +83,28 @@ tr:nth-child(even) {
     background: #f0f8ff;
 }
 
+/* Search Box */
+.search-box {
+    margin: 20px auto;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
 /* Buttons */
 .filter-buttons button {
     background: #007bff;
@@ -116,6 +139,11 @@ tr:nth-child(even) {
     height: 40px;
     animation: spin 1s linear infinite;
 }
+
+/* Status Colors */
+.completed-status { color: green; font-weight: bold; }
+.incomplete-status { color: orange; font-weight: bold; }
+.pending-status { color: red; font-weight: bold; }
 
 /* Footer */
 .footer {
