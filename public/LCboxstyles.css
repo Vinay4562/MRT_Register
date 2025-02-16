@@ -98,7 +98,7 @@ body {
 
 .pending-status {
     background-color: #FFA500;
-    color: white;
+    color: black;
     padding: 5px;
     border-radius: 4px;
     text-align: center;
@@ -106,7 +106,7 @@ body {
 
 .incomplete-status {
     background-color: #FF4500;
-    color: white;
+    color: black;
     padding: 5px;
     border-radius: 4px;
     text-align: center;
@@ -114,7 +114,7 @@ body {
 
 .completed-status {
     background-color: #28A745;
-    color: white;
+    color: black;
     padding: 5px;
     border-radius: 4px;
     text-align: center;

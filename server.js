@@ -111,12 +111,10 @@ app.post('/login', async (req, res) => {
 });
 
 // Route to handle logout
-app.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).send('Error logging out');
-        }
-        res.redirect('/login');
+app.post("/logout", (req, res) => {
+    res.clearCookie("sessionToken"); // Clear authentication cookie (if applicable)
+    req.session.destroy(() => {
+        res.status(200).json({ message: "Logged out successfully" });
     });
 });
 
