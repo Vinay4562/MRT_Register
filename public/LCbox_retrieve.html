@@ -212,6 +212,8 @@
             fetchData();
         });
 
+        let allData = []; // Store original data globally
+
         async function fetchData() {
             const loader = document.getElementById("loader");
             const searchBox = document.querySelector(".search-box");
@@ -220,22 +222,8 @@
             try {
                 const response = await fetch('https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders');
                 const data = await response.json();
-                const tableBody = document.getElementById("displayTableBody");
-                tableBody.innerHTML = ''; // Clear any existing data
-
-                let counts = { all: 0, completed: 0, incomplete: 0, pending: 0 };
-
-                data.forEach(function (feeder, index) {
-                    addRowToDisplayTable(feeder, index);
-                    counts.all++; // Increment total count
-                    counts[feeder.status.toLowerCase()]++; // Increment specific status count
-                });
-
-                // Update the button counts
-                document.getElementById("all-count").textContent = counts.all;
-                document.getElementById("completed-count").textContent = counts.completed;
-                document.getElementById("incomplete-count").textContent = counts.incomplete;
-                document.getElementById("pending-count").textContent = counts.pending;
+                allData = data; // Store all data globally
+                updateTable(allData); // Populate the table initially
 
                 // Hide loader and show table
                 loader.style.display = 'none';
@@ -245,6 +233,28 @@
                 console.error('Error fetching data:', error);
                 loader.style.display = 'none';
             }
+        }
+
+        function updateTable(filteredData) {
+            const tableBody = document.getElementById("displayTableBody");
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            let counts = { all: 0, completed: 0, incomplete: 0, pending: 0 };
+
+            filteredData.forEach((feeder, index) => {
+                addRowToDisplayTable(feeder, index + 1); // Ensure serial numbers are correct
+                counts.all++;
+                let status = feeder.status ? feeder.status.trim().toLowerCase() : '';
+                if (counts[status] !== undefined) {
+                    counts[status]++;
+                }
+            });
+
+            // Update filter button counts
+            document.getElementById("all-count").textContent = counts.all;
+            document.getElementById("completed-count").textContent = counts.completed;
+            document.getElementById("incomplete-count").textContent = counts.incomplete;
+            document.getElementById("pending-count").textContent = counts.pending;
         }
 
         function addRowToDisplayTable(data, index) {
@@ -307,25 +317,13 @@
             }
         }
 
+        // Filtering Function
         function filterByStatus(status) {
-            const table = document.getElementById("displayTableBody");
-            const rows = table.getElementsByTagName("tr");
-
-            for (let i = 0; i < rows.length; i++) {
-                const statusCell = rows[i].getElementsByClassName("status-cell")[0];
-                if (statusCell) {
-                    const rowStatus = statusCell.className.split(" ")[1].replace("-status", "");
-
-                    if (status === 'all' || rowStatus === status) {
-                        rows[i].style.display = ""; // Show row
-                    } else {
-                        rows[i].style.display = "none"; // Hide row
-                    }
-                }
+            let filteredData = allData;
+            if (status !== 'all') {
+                filteredData = allData.filter(feeder => feeder.status.trim().toLowerCase() === status);
             }
-
-            // Update counts after filtering
-            updateCounts();
+            updateTable(filteredData); // Update the table with filtered data
         }
 
         // Call updateCounts when the page loads or data changes
