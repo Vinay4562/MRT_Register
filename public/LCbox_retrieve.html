@@ -243,17 +243,29 @@
             tableBody.innerHTML = ''; // Clear table before adding new data
 
             filteredData.forEach((feeder, index) => {
+                const feederName = feeder.name ? feeder.name : "N/A"; // Handle undefined values
+                const lastTestedDate = feeder.lastTestedDate ? formatDate(feeder.lastTestedDate) : "N/A";
+                const nextTestingDate = feeder.nextTestingDate ? formatDate(feeder.nextTestingDate) : "N/A";
+                const status = feeder.status ? feeder.status : "N/A";
+                const remarks = feeder.remarks ? feeder.remarks : "N/A";
+
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${index + 1}</td> <!-- Ensures correct serial numbers -->
-                    <td>${feeder.name}</td>
-                    <td>${feeder.lastTestedDate}</td>
-                    <td>${feeder.nextTestingDate}</td>
-                    <td class="status-cell ${getStatusClass(feeder.status)}">${feeder.status}</td>
-                    <td>${feeder.remarks}</td>
+                    <td>${index + 1}</td> <!-- Serial Number -->
+                    <td>${feederName}</td>
+                    <td>${lastTestedDate}</td>
+                    <td>${nextTestingDate}</td>
+                    <td class="status-cell ${getStatusClass(status)}">${status}</td>
+                    <td>${remarks}</td>
                 `;
                 tableBody.appendChild(row);
             });
+        }
+
+        // Function to format dates properly
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
         }
 
         // Function to update filter button counts
