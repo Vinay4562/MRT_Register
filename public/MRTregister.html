@@ -173,12 +173,13 @@
                     }
 
                     const data = await response.json();
+                    console.log("Server Response:", data); // Debug API response
+
                     if (!data || !data._id) {
-                        throw new Error("Invalid response data");
+                        throw new Error("Invalid response data - missing _id");
                     }
 
                     if (isEditing) {
-                        // **Update existing row**
                         const row = document.querySelector(`tr[data-id="${currentEditId}"]`);
                         if (row) {
                             row.cells[1].textContent = data.feederName || "N/A";
@@ -189,18 +190,9 @@
                         }
                         showPopup("Data modified successfully");
                     } else {
-                        // **Find last serial number correctly**
-                        let lastSerialNumber = 0;
                         const rows = document.querySelectorAll("#data-table tbody tr");
+                        const newSerialNumber = rows.length + 1; // More robust serial numbering
 
-                        if (rows.length > 0) {
-                            const lastRow = rows[rows.length - 1];
-                            const lastSerial = parseInt(lastRow.cells[0].textContent, 10);
-                            lastSerialNumber = isNaN(lastSerial) ? 0 : lastSerial;
-                        }
-                        const newSerialNumber = lastSerialNumber + 1;
-
-                        // Create new row with incremented serial number
                         const newRow = document.createElement("tr");
                         newRow.dataset.id = data._id;
                         newRow.innerHTML = `
@@ -213,11 +205,11 @@
                             <td><button class="edit-button">Edit</button></td>
                             <td><button class="delete-button">Delete</button></td>
                         `;
-                        dataTable.appendChild(newRow);
+                        document.querySelector("#data-table tbody").appendChild(newRow);
                         showPopup("Feeder Added Successfully");
                     }
 
-                    modalOverlay.style.display = "none";
+                    document.getElementById("modal-overlay").style.display = "none";
                 } catch (error) {
                     console.error("Submit error:", error);
                 }
