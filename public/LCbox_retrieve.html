@@ -281,13 +281,32 @@
             cell6.textContent = data.remarks;
         }
 
+        function updateCounts() {
+            let counts = { all: 0, completed: 0, incomplete: 0, pending: 0 };
+
+            allData.forEach(feeder => {
+                let status = feeder.status ? feeder.status.trim().toLowerCase() : '';
+                counts.all++;
+                if (counts[status] !== undefined) {
+                    counts[status]++;
+                }
+            });
+
+            // Update filter button counts
+            document.getElementById("all-count").textContent = counts.all;
+            document.getElementById("completed-count").textContent = counts.completed;
+            document.getElementById("incomplete-count").textContent = counts.incomplete;
+            document.getElementById("pending-count").textContent = counts.pending;
+        }
+
         // 🔹 **Filter by Status**
         function filterByStatus(status) {
             let filteredData = allData;
             if (status !== 'all') {
                 filteredData = allData.filter(feeder => feeder.status.trim().toLowerCase() === status);
             }
-            updateTable(filteredData); // Update the table with filtered data
+            updateTable(filteredData); // Update table with filtered data
+            updateCounts(); // Ensure all filter button counts are updated
         }
 
         // 🔹 **Search Function**
