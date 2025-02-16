@@ -93,6 +93,20 @@
 
             const applyStatusClass = (status) => status ? status.toLowerCase().replace(/\s/g, "-") + "-status" : "";
 
+            // Function to show a popup message
+            const showPopup = (message, isError = false) => {
+                const popup = document.createElement("div");
+                popup.className = `popup ${isError ? "error" : "success"}`;
+                popup.textContent = message;
+
+                document.body.appendChild(popup);
+
+                // Remove the popup after 3 seconds
+                setTimeout(() => {
+                    popup.remove();
+                }, 1500);
+            };
+
             const fetchData = async () => {
                 try {
                     const response = await fetch("https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders", {
@@ -210,12 +224,14 @@
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(formObject),
                         });
+                        showPopup("Feeder updated successfully!");
                     } else {
                         response = await fetch("https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/feeders", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(formObject),
                         });
+                        showPopup("Feeder added successfully!");
                     }
 
                     if (!response.ok) throw new Error("Network response was not ok");
@@ -227,6 +243,7 @@
                     fetchData();
                 } catch (error) {
                     console.error("Error:", error);
+                    showPopup("Error saving feeder", true);
                 }
             });
 
