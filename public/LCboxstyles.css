@@ -132,17 +132,22 @@ body {
 .popup {
     position: fixed;
     top: 20px;
-    right: 20px;
-    padding: 15px;
-    background: #4CAF50;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 5px;
     color: white;
-    border-radius: 4px;
-    display: none;
+    font-size: 16px;
     z-index: 1000;
+    opacity: 0.9;
+}
+
+.popup.success {
+    background-color: #4CAF50; /* Green */
 }
 
 .popup.error {
-    background: #f44336;
+    background-color: #f44336; /* Red */
 }
 
 /* Modal */

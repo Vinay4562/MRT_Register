@@ -95,16 +95,22 @@
 
             // Function to show a popup message
             const showPopup = (message, isError = false) => {
-                const popup = document.createElement("div");
-                popup.className = `popup ${isError ? "error" : "success"}`;
+                const popup = document.getElementById("successPopup");
                 popup.textContent = message;
+                popup.className = "popup" + (isError ? " error" : "");
+                popup.style.display = "block";
 
-                document.body.appendChild(popup);
-
-                // Remove the popup after 3 seconds
                 setTimeout(() => {
-                    popup.remove();
+                    popup.style.display = "none";
                 }, 1500);
+            };
+
+            // Function to update serial numbers in the table
+            const updateSerialNumbers = () => {
+                const rows = document.querySelectorAll("#data-table tbody tr");
+                rows.forEach((row, index) => {
+                    row.cells[0].textContent = index + 1;
+                });
             };
 
             const fetchData = async () => {
@@ -247,73 +253,55 @@
                 }
             });
 
-            fetchData(); // Load data when the page loads
+            // Prevent back navigation
+            const preventBack = () => {
+                window.history.forward();
+            };
 
-        // Add this function at the top of your script
-        function showPopup(message, isError = false) {
-            const popup = document.getElementById("successPopup");
-            popup.textContent = message;
-            popup.className = "popup" + (isError ? " error" : "");
-            popup.style.display = "block";
-            
-            setTimeout(() => {
-                popup.style.display = "none";
-            }, 1500);
-        }
+            window.onload = function () {
+                fetchData();
 
-        function updateSerialNumbers() {
-            const rows = document.querySelectorAll("#data-table tbody tr");
-            rows.forEach((row, index) => {
-                row.cells[0].textContent = index + 1;
+                // Check authentication status
+                fetch("https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/api/check-auth", {
+                    credentials: "include",
+                })
+                    .then((response) => {
+                        if (response.status === 401) {
+                            window.location.href = "/login.html";
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        window.location.href = "/login.html";
+                    });
+
+                preventBack();
+            };
+
+            window.addEventListener("popstate", preventBack);
+
+            // Logout functionality
+            document.getElementById("logoutButton").addEventListener("click", function () {
+                if (confirm("Are you sure you want to logout?")) {
+                    fetch("/logout", {
+                        method: "POST",
+                        credentials: "include"
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message === "Logged out successfully") {
+                                window.location.href = "/login.html";
+                            } else {
+                                showPopup("Error logging out", true);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error during logout:", error);
+                            showPopup("Error logging out", true);
+                        });
+                }
             });
-        }
-
-        const preventBack = () => {
-            window.history.forward();
-        };
-
-        window.onload = function () {
-            fetchData();
-
-            fetch("https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/api/check-auth", {
-                credentials: "include",
-            })
-                .then((response) => {
-                    if (response.status === 401) {
-                        window.location.href = "/login.html";
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    window.location.href = "/login.html";
-                });
-
-            preventBack();
-        };
-
-        window.addEventListener("popstate", preventBack);
-
-        document.getElementById("logoutButton").addEventListener("click", function () {
-            if (confirm("Are you sure you want to logout?")) {
-                fetch("/logout", {
-                    method: "POST",
-                    credentials: "include"
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message === "Logged out successfully") {
-                        window.location.href = "/login.html";
-                    } else {
-                        showPopup("Error logging out", true);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error during logout:", error);
-                    showPopup("Error logging out", true);
-                });
-            }
         });
-    });
 </script>
 </body>
 </html>
