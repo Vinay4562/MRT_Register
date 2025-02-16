@@ -179,6 +179,7 @@
                 }
 
                 if (isEditing) {
+                    // Update existing row
                     const row = document.querySelector(`tr[data-id="${currentEditId}"]`);
                     if (row) {
                         row.cells[1].textContent = data.feederName || "N/A";
@@ -189,15 +190,25 @@
                     }
                     showPopup("Data modified successfully");
                 } else {
+                    // **Find last serial number**
+                    let lastSerialNumber = 0;
+                    const rows = document.querySelectorAll("#dataTable tr");
+                    if (rows.length > 1) { // Assuming first row is the header
+                        const lastRow = rows[rows.length - 1];
+                        lastSerialNumber = parseInt(lastRow.cells[0].textContent, 10) || 0;
+                    }
+                    const newSerialNumber = lastSerialNumber + 1;
+
                     if (!dataTable) {
                         console.error("dataTable element not found.");
                         return;
                     }
 
+                    // Create new row with incremented serial number
                     const newRow = document.createElement("tr");
                     newRow.dataset.id = data._id;
                     newRow.innerHTML = `
-                        <td>${serialCounter++}</td>
+                        <td>${newSerialNumber}</td>
                         <td>${data.feederName || "N/A"}</td>
                         <td>${formatDate(data.lastTestedDate)}</td>
                         <td>${formatDate(data.scheduledDate)}</td>
