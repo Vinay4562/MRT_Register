@@ -24,11 +24,11 @@ body {
 
 /* Logo styling */
 .logo {
-    width: 100px; /* Adjust size as needed */
-    margin-right: 20px;
-    background-color: white; /* Remove background color */
-    position: absolute;
-    left: 20px; /* Align logo to the left side of the header */
+    width: 130px;
+    height: 100px;
+    background-color: white; /* Set background color to white */
+    padding: 10px; /* Optional: Add some padding around the logo */
+    border-radius: 10px; /* Optional: Add rounded corners */
 }
 
 .logo:hover {
