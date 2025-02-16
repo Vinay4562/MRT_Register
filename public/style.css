@@ -8,19 +8,25 @@ body {
     text-align: center;
 }
 
+/* Header Section */
 .header {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    animation: fadeIn 1.5s ease-in-out;
 }
 
 .logo {
     width: 130px;
     height: 100px;
     object-fit: contain;
+    background: white; /* Keeping background color for the logo */
+    padding: 5px;
+    border-radius: 10px; /* Optional rounded corners */
 }
 
+/* Heading Animation */
 h1 {
     font-size: 24px;
     margin-left: 10px;
@@ -28,31 +34,30 @@ h1 {
     animation: fadeIn 1.5s ease-in-out;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
+/* Navigation Bar */
 .navbar {
     display: flex;
     justify-content: center;
     background: #003366;
     padding: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    animation: slideIn 1s ease-in-out;
 }
 
 .navbar a {
     color: white;
     text-decoration: none;
     padding: 10px 20px;
-    transition: 0.3s;
+    transition: 0.3s ease-in-out;
 }
 
 .navbar a:hover {
     background: #005bb5;
     border-radius: 5px;
+    transform: scale(1.1);
 }
 
+/* Filter Buttons */
 .filter-buttons button {
     background: #005bb5;
     color: white;
@@ -60,18 +65,22 @@ h1 {
     padding: 10px 15px;
     margin: 5px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.3s ease-in-out;
     border-radius: 5px;
+    animation: fadeInUp 1s ease-in-out;
 }
 
 .filter-buttons button:hover {
     background: #003366;
+    transform: scale(1.1);
 }
 
+/* Search Box */
 .search-box {
     display: flex;
     justify-content: center;
     margin: 20px;
+    animation: fadeInUp 1s ease-in-out;
 }
 
 .search-input {
@@ -79,19 +88,22 @@ h1 {
     padding: 10px;
     border: 2px solid #005bb5;
     border-radius: 5px;
-    transition: 0.3s;
+    transition: 0.3s ease-in-out;
 }
 
 .search-input:focus {
     border-color: #003366;
     outline: none;
+    box-shadow: 0 0 10px #005bb5;
 }
 
+/* Table Styling */
 table {
     width: 90%;
     margin: auto;
     border-collapse: collapse;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 1s ease-in-out;
 }
 
 table th, table td {
@@ -104,9 +116,11 @@ table th {
     color: white;
 }
 
+/* Status Cell Styling */
 .status-cell {
     font-weight: bold;
     text-transform: capitalize;
+    animation: pulse 2s infinite;
 }
 
 .completed-status {
@@ -121,6 +135,7 @@ table th {
     color: red;
 }
 
+/* Footer */
 .footer {
     background: #003366;
     color: white;
@@ -128,4 +143,49 @@ table th {
     position: absolute;
     width: 100%;
     bottom: 0;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Loader Animation */
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.loader {
+    border: 8px solid #e6f2ff;
+    border-top: 8px solid #003366;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
