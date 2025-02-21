@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <title>MRT Testing Details</title>
 
@@ -37,6 +41,13 @@
         <button onclick="filterByStatus('completed')">Completed (<span id="completed-count">0</span>)</button>
         <button onclick="filterByStatus('incomplete')">Incomplete (<span id="incomplete-count">0</span>)</button>
         <button onclick="filterByStatus('pending')">Pending (<span id="pending-count">0</span>)</button>
+    </div>
+
+    <!-- Download Button -->
+    <div class="download-container">
+        <button onclick="downloadPDF()" class="download-btn">
+            <i class="fa fa-download"></i> Download PDF
+        </button>
     </div>
 
     <!-- Search Box -->
@@ -191,6 +202,62 @@
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
             return `${day}-${month}-${year}`;
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add logo
+            const img = new Image();
+            img.src = 'logo_new.png';
+
+            img.onload = function () {
+                doc.addImage(img, 'PNG', 80, 5, 50, 30); // Centered logo
+                generatePDF(doc);
+            };
+        }
+
+        function generatePDF(doc) {
+            // Add title below the logo
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text("𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃", 40, 45);
+
+            // Add a subtitle
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text("MRT Testing Details", 85, 55);
+
+            let tableBody = document.getElementById("displayTableBody").rows;
+            if (tableBody.length === 0) {
+                alert("No data available to download!");
+                return;
+            }
+
+            let data = [];
+            let headers = ["S.No", "Feeder Names", "Last Tested Date", "Next Testing Date", "Status", "Remarks"];
+
+            // Fetch table data
+            for (let i = 0; i < tableBody.length; i++) {
+                let row = tableBody[i].cells;
+                let rowData = [];
+                for (let j = 0; j < row.length; j++) {
+                    rowData.push(row[j].textContent.trim());
+                }
+                data.push(rowData);
+            }
+
+            // Table formatting in PDF
+            doc.autoTable({
+                head: [headers],
+                body: data,
+                startY: 65, // Adjusted to start after header
+                styles: { fontSize: 10 },
+                headStyles: { fillColor: [0, 112, 192], textColor: 255 },
+            });
+
+            doc.save("MRT_Testing_Details.pdf");
         }
     </script>
 </body>
