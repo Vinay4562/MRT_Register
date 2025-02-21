@@ -93,7 +93,8 @@ tr:nth-child(even) {
 }
 
 .download-container {
-    text-align: right;
+    display: flex;
+    justify-content: flex-end;  /* Moves button to right */
     margin-bottom: 10px;
     margin-right: 10px;
 }
