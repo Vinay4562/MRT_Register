@@ -8,6 +8,7 @@
     <!-- Include jsPDF library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <title>MRT Testing Details</title>
 
@@ -34,6 +35,13 @@
      <div id="loader" class="loader-container">
         <div class="loader"></div>
     </div>
+    
+    <!-- Download Button -->
+    <div class="download-container">
+        <button onclick="downloadPDF()" class="download-btn">
+            <i class="fa fa-download"></i> Download PDF
+        </button>
+    </div>
 
     <!-- Filter Buttons -->
     <div class="filter-buttons">
@@ -41,13 +49,6 @@
         <button onclick="filterByStatus('completed')">Completed (<span id="completed-count">0</span>)</button>
         <button onclick="filterByStatus('incomplete')">Incomplete (<span id="incomplete-count">0</span>)</button>
         <button onclick="filterByStatus('pending')">Pending (<span id="pending-count">0</span>)</button>
-    </div>
-
-    <!-- Download Button -->
-    <div class="download-container">
-        <button onclick="downloadPDF()" class="download-btn">
-            <i class="fa fa-download"></i> Download PDF
-        </button>
     </div>
 
     <!-- Search Box -->
