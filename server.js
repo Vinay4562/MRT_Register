@@ -7,6 +7,8 @@ const cors = require('cors');
 const path = require('path');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const cron = require('node-cron');
+const twilio = require('twilio');
 require('dotenv').config();
 
 const app = express();
@@ -18,12 +20,9 @@ mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
-
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB');
-});
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => console.log('Connected to MongoDB'));
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -32,43 +31,65 @@ app.use(cors({
     origin: ['http://400kvssshankarpally.free.nf', 'https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app'],
     credentials: true
 }));
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Session Middleware
 app.use(session({
-    secret: 'mysecretkey',
+    secret: process.env.SESSION_SECRET || 'mysecretkey',
     resave: false,
     saveUninitialized: false,
-    cookie: {
-        maxAge: 1000 * 60 * 60, // 1 hour session
-        httpOnly: true, // Prevent access via JavaScript
-        secure: false // Set to true if using HTTPS
-    }
+    cookie: { maxAge: 1000 * 60 * 60, httpOnly: true, secure: false }
 }));
 
-// Passport configuration
+// Passport Configuration
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy(
-    (username, password, done) => {
-        if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
-            return done(null, { username });
-        } else {
-            return done(null, false, { message: 'Invalid credentials' });
-        }
+const defaultUsername = 'Shankarpally400kv';
+const hashedPassword = bcrypt.hashSync('Shankarpally@9870', 10);
+
+passport.use(new LocalStrategy((username, password, done) => {
+    if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
+        return done(null, { username });
     }
-));
+    return done(null, false, { message: 'Invalid credentials' });
+}));
 
-passport.serializeUser((user, done) => {
-    done(null, user.username);
+passport.serializeUser((user, done) => done(null, user.username));
+passport.deserializeUser((username, done) => done(null, { username }));
+
+// Authentication Routes
+app.get('/api/check-auth', (req, res) => {
+    res.status(req.session.loggedIn ? 200 : 401).json({ authenticated: !!req.session.loggedIn });
 });
 
-passport.deserializeUser((username, done) => {
-    done(null, { username });
+app.get('/login', (req, res) => {
+    req.session.loggedIn ? res.redirect('/MRTregister.html') : res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// Define schema and model
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
+        req.session.loggedIn = true;
+        req.session.username = username;
+        return res.redirect('/MRTregister.html');
+    }
+    res.status(401).send('Invalid credentials. <a href="/login">Try again</a>');
+});
+
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) return res.status(500).json({ message: 'Logout failed' });
+        res.clearCookie('connect.sid');
+        res.status(200).json({ message: 'Logged out successfully' });
+    });
+});
+
+app.get('/MRTregister.html', (req, res) => {
+    req.session.loggedIn ? res.sendFile(path.join(__dirname, 'public', 'MRTregister.html')) : res.redirect('/login');
+});
+
+// Define Feeder Schema & Model
 const feederSchema = new mongoose.Schema({
     feederName: { type: String, required: true },
     lastTestedDate: { type: Date, required: true },
@@ -76,77 +97,20 @@ const feederSchema = new mongoose.Schema({
     status: { type: String, required: true },
     remarks: { type: String }
 });
-
 const Feeder = mongoose.model('Feeder', feederSchema);
 
-// Default credentials (for testing)
-const defaultUsername = 'Shankarpally400kv';
-const defaultPassword = 'Shankarpally@9870'; // Use bcrypt to hash the password
-
-app.get('/api/check-auth', (req, res) => {
-    if (req.session.loggedIn) {
-        res.status(200).json({ authenticated: true });
-    } else {
-        res.status(401).json({ authenticated: false });
-    }
-});
-
-// Route to render login page
-app.get('/login', (req, res) => {
-    if (req.session.loggedIn) {
-        res.redirect('/MRTregister.html'); // Redirect if already logged in
-    } else {
-        res.sendFile(path.join(__dirname, 'public', 'login.html'));
-    }
-});
-
-const hashedPassword = bcrypt.hashSync('Shankarpally@9870', 10);
-
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-
-    if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
-        req.session.loggedIn = true;
-        req.session.username = username;
-        return res.redirect('/MRTregister.html');
-    }
-
-    res.status(401).send('Invalid credentials. <a href="/login">Try again</a>');
-});
-
-// Route to handle logout
-app.post("/logout", (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).json({ message: "Logout failed" });
-        }
-        res.clearCookie("connect.sid"); // Clear session cookie
-        res.status(200).json({ message: "Logged out successfully" });
-    });
-});
-
-// Protected route for MRTregister.html
-app.get('/MRTregister.html', (req, res) => {
-    if (req.session.loggedIn) {
-        res.sendFile(path.join(__dirname, 'public', 'MRTregister.html'));
-    } else {
-        res.redirect('/login');
-    }
-});
-
-// Routes
+// CRUD Routes for Feeders
 app.get('/feeders', async (req, res) => {
     try {
-        const feeders = await Feeder.find();
-        res.json(feeders);
+        res.json(await Feeder.find());
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
 app.post('/feeders', async (req, res) => {
-    const feeder = new Feeder(req.body);
     try {
+        const feeder = new Feeder(req.body);
         await feeder.save();
         res.status(201).json(feeder);
     } catch (error) {
@@ -155,76 +119,49 @@ app.post('/feeders', async (req, res) => {
 });
 
 app.put('/feeders/:id', async (req, res) => {
-    const { id } = req.params;
     try {
-        const updatedFeeder = await Feeder.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
-        if (!updatedFeeder) {
-            return res.status(404).json({ message: 'Feeder not found' });
-        }
-        res.json(updatedFeeder);
+        const updatedFeeder = await Feeder.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        updatedFeeder ? res.json(updatedFeeder) : res.status(404).json({ message: 'Feeder not found' });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
 
 app.delete('/feeders/:id', async (req, res) => {
-    const { id } = req.params;
     try {
-        const feeder = await Feeder.findByIdAndDelete(id);
-        if (!feeder) {
-            return res.status(404).json({ message: 'Feeder not found' });
-        }
-        res.sendStatus(204);
+        const feeder = await Feeder.findByIdAndDelete(req.params.id);
+        feeder ? res.sendStatus(204) : res.status(404).json({ message: 'Feeder not found' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-const twilio = require('twilio');
-
-const twilioClient = new twilio(
-    process.env.TWILIO_ACCOUNT_SID,
-    process.env.TWILIO_AUTH_TOKEN
-);
+// Twilio SMS Reminder
+const twilioClient = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 async function sendSMS(feederName, nextTestDate) {
-    const messageBody = `Reminder: Next Testing Date for ${feederName} is on ${nextTestDate}. Please be prepared.`;
-
     try {
-        const message = await twilioClient.messages.create({
-            body: messageBody,
+        await twilioClient.messages.create({
+            body: `Reminder: Next Testing Date for ${feederName} is on ${nextTestDate}. Please be prepared.`,
             from: process.env.TWILIO_PHONE_NUMBER,
             to: process.env.ADMIN_PHONE_NUMBER
         });
-
-        console.log(`SMS sent successfully: ${message.sid}`);
+        console.log(`SMS sent successfully for ${feederName}`);
     } catch (error) {
         console.error("Error sending SMS:", error);
     }
 }
 
-cron.schedule('0 9 * * *', async () => { // Runs every day at 9 AM
-    console.log("Checking for upcoming feeder tests...");
-
+cron.schedule('0 9 * * *', async () => {
     try {
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Normalize time to midnight
-
+        today.setHours(0, 0, 0, 0);
         const upcomingFeeders = await Feeder.find({ scheduledDate: { $gte: today } });
-
-        if (upcomingFeeders.length === 0) {
-            console.log("No upcoming tests for today.");
-            return;
-        }
-
-        for (const feeder of upcomingFeeders) {
-            await sendSMS(feeder.feederName, feeder.scheduledDate.toDateString());
-        }
+        upcomingFeeders.forEach(feeder => sendSMS(feeder.feederName, feeder.scheduledDate.toDateString()));
     } catch (error) {
         console.error("Error fetching feeder data:", error);
     }
 });
-
 console.log("🚀 SMS Reminder Scheduler is Running...");
 
 // General error handler
@@ -233,6 +170,4 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something went wrong!');
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/`);
-});
+app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
