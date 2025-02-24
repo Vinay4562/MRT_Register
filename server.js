@@ -139,10 +139,10 @@ app.delete('/feeders/:id', async (req, res) => {
 // Twilio SMS Reminder
 const twilioClient = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-async function sendSMS(feederName, nextTestDate) {
+async function sendSMS(feederName, scheduledDate) {
     try {
         await twilioClient.messages.create({
-            body: `Reminder: Next Testing Date for ${feederName} is on ${nextTestDate}. Please be prepared.`,
+            body: `Reminder: Next Testing Date for ${feederName} is on ${scheduledDate}. Please be prepared.`,
             from: process.env.TWILIO_PHONE_NUMBER,
             to: process.env.ADMIN_PHONE_NUMBER
         });
