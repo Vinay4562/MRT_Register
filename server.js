@@ -180,6 +180,53 @@ app.delete('/feeders/:id', async (req, res) => {
     }
 });
 
+const twilio = require('twilio');
+
+const twilioClient = new twilio(
+    process.env.TWILIO_ACCOUNT_SID,
+    process.env.TWILIO_AUTH_TOKEN
+);
+
+async function sendSMS(feederName, nextTestDate) {
+    const messageBody = `Reminder: Next Testing Date for ${feederName} is on ${nextTestDate}. Please be prepared.`;
+
+    try {
+        const message = await twilioClient.messages.create({
+            body: messageBody,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: process.env.ADMIN_PHONE_NUMBER
+        });
+
+        console.log(`SMS sent successfully: ${message.sid}`);
+    } catch (error) {
+        console.error("Error sending SMS:", error);
+    }
+}
+
+cron.schedule('0 9 * * *', async () => { // Runs every day at 9 AM
+    console.log("Checking for upcoming feeder tests...");
+
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize time to midnight
+
+        const upcomingFeeders = await Feeder.find({ scheduledDate: { $gte: today } });
+
+        if (upcomingFeeders.length === 0) {
+            console.log("No upcoming tests for today.");
+            return;
+        }
+
+        for (const feeder of upcomingFeeders) {
+            await sendSMS(feeder.feederName, feeder.scheduledDate.toDateString());
+        }
+    } catch (error) {
+        console.error("Error fetching feeder data:", error);
+    }
+});
+
+console.log("🚀 SMS Reminder Scheduler is Running...");
+
 // General error handler
 app.use((err, req, res, next) => {
     console.error(err.stack);

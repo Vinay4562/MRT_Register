@@ -21,9 +21,11 @@
     "express-session": "^1.18.1",
     "express-validator": "^7.1.0",
     "mongoose": "^8.9.5",
+    "node-cron": "^3.0.3",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "pm2": "^5.4.2"
+    "pm2": "^5.4.2",
+    "twilio": "^5.4.5"
   },
   "engines": {
     "node": "20.x"
