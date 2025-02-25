@@ -164,6 +164,23 @@ cron.schedule('0 9 * * *', async () => {
 });
 console.log("🚀 SMS Reminder Scheduler is Running...");
 
+app.get('/test-sms', async (req, res) => {
+    try {
+        const feeder = { feederName: "Test Feeder", scheduledDate: new Date().toDateString() };
+        await sendSMS(feeder.feederName, feeder.scheduledDate);
+        res.send("SMS sent successfully!");
+    } catch (error) {
+        res.status(500).send("Error sending SMS: " + error.message);
+    }
+});
+
+app.get('/check-env', (req, res) => {
+    res.json({
+        ADMIN_PHONE_NUMBER: process.env.ADMIN_PHONE_NUMBER,
+        TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER
+    });
+});
+
 // General error handler
 app.use((err, req, res, next) => {
     console.error(err.stack);
