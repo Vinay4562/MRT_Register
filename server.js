@@ -152,25 +152,29 @@ async function sendSMS(feederName, scheduledDate) {
     }
 }
 
-cron.schedule('0 9 * * *', async () => {
-    try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const upcomingFeeders = await Feeder.find({ scheduledDate: { $gte: today } });
-        upcomingFeeders.forEach(feeder => sendSMS(feeder.feederName, feeder.scheduledDate.toDateString()));
-    } catch (error) {
-        console.error("Error fetching feeder data:", error);
-    }
-});
+cron.schedule('30 3 * * *', async () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    console.log("Cron job running. Querying for scheduledDate >=:", today.toISOString());
+  
+    const feeders = await Feeder.find({ scheduledDate: { $gte: today } });
+    console.log("Feeders found:", feeders.length);
+    feeders.forEach(feeder => {
+      console.log("Sending SMS for:", feeder.feederName);
+      sendSMS(feeder.feederName, feeder.scheduledDate);
+    });
+  });
 console.log("🚀 SMS Reminder Scheduler is Running...");
 
 app.get('/test-sms', async (req, res) => {
     try {
-        const feeder = { feederName: "Test Feeder", scheduledDate: new Date().toDateString() };
-        await sendSMS(feeder.feederName, feeder.scheduledDate);
-        res.send("SMS sent successfully!");
+      const feeder = await Feeder.findOne({ feederName: "220KV Gachibowli-4" });
+      if (!feeder) return res.status(404).send("Feeder not found");
+  
+      await sendSMS(feeder.feederName, feeder.scheduledDate);
+      res.send("SMS triggered manually!");
     } catch (error) {
-        res.status(500).send("Error sending SMS: " + error.message);
+      res.status(500).send("Error: " + error.message);
     }
 });
 
@@ -179,6 +183,11 @@ app.get('/check-env', (req, res) => {
         ADMIN_PHONE_NUMBER: process.env.ADMIN_PHONE_NUMBER,
         TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER
     });
+});
+
+// Add this route to server.js to check server time
+app.get('/server-time', (req, res) => {
+    res.send(`Server time: ${new Date().toString()}`);
 });
 
 // General error handler
