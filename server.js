@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const MongoStore = require('connect-mongo');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
@@ -39,6 +40,10 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'mysecretkey',
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: mongoUri, // Store sessions in MongoDB
+        collectionName: 'sessions'
+    }),
     cookie: { maxAge: 1000 * 60 * 60, httpOnly: true, secure: false }
 }));
 
