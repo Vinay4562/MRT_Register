@@ -17,11 +17,6 @@ const app = express();
 const port = process.env.PORT || 3500;
 const mongoUri = process.env.MONGO_URI;
 
-// Connect to MongoDB
-mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('Connected to MongoDB'));
@@ -41,15 +36,20 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        mongoUrl: mongoUri, // Store sessions in MongoDB
+        mongoUrl: mongoUri, // Ensure this is correctly set
         collectionName: 'sessions'
     }),
-    cookie: { maxAge: 1000 * 60 * 60, httpOnly: true, secure: false }
+    cookie: { maxAge: 1000 * 60 * 60, httpOnly: true, secure: process.env.NODE_ENV === 'production' }
 }));
 
 // Passport Configuration
 app.use(passport.initialize());
 app.use(passport.session());
+
+if (!process.env.DEFAULT_PASSWORD) {
+    console.error("❌ DEFAULT_PASSWORD is missing in the .env file!");
+    process.exit(1); // Stop execution to avoid errors
+}
 
 const defaultUsername = process.env.DEFAULT_USERNAME;
 const hashedPassword = bcrypt.hashSync(process.env.DEFAULT_PASSWORD, 10);
