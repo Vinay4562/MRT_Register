@@ -8,6 +8,7 @@ const path = require('path');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const cron = require('node-cron');
+const nodemailer = require('nodemailer');
 const twilio = require('twilio');
 require('dotenv').config();
 
@@ -45,8 +46,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-const defaultUsername = 'Shankarpally400kv';
-const hashedPassword = bcrypt.hashSync('Shankarpally@9870', 10);
+const defaultUsername = process.env.DEFAULT_USERNAME;
+const hashedPassword = bcrypt.hashSync(process.env.DEFAULT_PASSWORD, 10);
 
 passport.use(new LocalStrategy((username, password, done) => {
     if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
@@ -136,46 +137,106 @@ app.delete('/feeders/:id', async (req, res) => {
     }
 });
 
+// Nodemailer Setup
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+async function sendEmail(feederName, scheduledDate) {
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: process.env.NOTIFY_EMAIL,
+        subject: `MRT Testing Reminder - ${feederName}`,
+        text: `Reminder: MRT Testing for ${feederName} is scheduled on ${scheduledDate}. Please ensure necessary preparations.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Email sent successfully for ${feederName}`);
+    } catch (error) {
+        console.error("Error sending email:", error);
+    }
+}
+
+cron.schedule('0 7 * * *', async () => {  // Runs at 07:00 AM UTC daily
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);  // Convert to UTC midnight
+
+    const startOfDay = new Date(today);
+    const endOfDay = new Date(today);
+    endOfDay.setUTCHours(23, 59, 59, 999);  // Ensure full day range
+
+    console.log("Checking for scheduled tests on:", today.toISOString());
+
+    const feeders = await Feeder.find({
+        scheduledDate: { $gte: startOfDay, $lte: endOfDay }  // Matches all times within the day
+    });
+
+    console.log(`Found ${feeders.length} feeders scheduled for today.`);
+
+    feeders.forEach(feeder => {
+        console.log("Sending email for:", feeder.feederName);
+        sendEmail(feeder.feederName, feeder.scheduledDate);
+    });
+});
+
+console.log("🚀 Email Reminder Scheduler set for 07:00 AM UTC...");
+
 // Twilio SMS Reminder
 const twilioClient = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 async function sendSMS(feederName, scheduledDate) {
+    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
+        console.error("Twilio credentials are missing! Check your .env file.");
+        return;
+    }
+    
     try {
-        await twilioClient.messages.create({
+        const message = await twilioClient.messages.create({
             body: `Reminder: Next Testing Date for ${feederName} is on ${scheduledDate}. Please be prepared.`,
             from: process.env.TWILIO_PHONE_NUMBER,
             to: process.env.ADMIN_PHONE_NUMBER
         });
-        console.log(`SMS sent successfully for ${feederName}`);
+        console.log(`✅ SMS sent successfully for ${feederName}. SID: ${message.sid}`);
     } catch (error) {
-        console.error("Error sending SMS:", error);
+        console.error("❌ Error sending SMS:", error);
     }
 }
 
-cron.schedule('30 3 * * *', async () => {
+cron.schedule('30 1 * * *', async () => {  // Runs at 01:30 AM UTC (07:00 AM IST)
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    console.log("Cron job running. Querying for scheduledDate >=:", today.toISOString());
-  
-    const feeders = await Feeder.find({ scheduledDate: { $gte: today } });
-    console.log("Feeders found:", feeders.length);
-    feeders.forEach(feeder => {
-      console.log("Sending SMS for:", feeder.feederName);
-      sendSMS(feeder.feederName, feeder.scheduledDate);
-    });
-  });
-console.log("🚀 SMS Reminder Scheduler is Running...");
+    today.setUTCHours(0, 0, 0, 0);
 
+    const tomorrow = new Date(today);
+    tomorrow.setUTCDate(today.getUTCDate() + 1); // Move to next day
+
+    console.log("🔍 Cron job running. Querying for scheduledDate:", today.toISOString());
+
+    const feeders = await Feeder.find({
+        scheduledDate: { $gte: today, $lt: tomorrow }  // Match entire UTC day
+    });
+
+    console.log(`📢 Found ${feeders.length} feeders scheduled for today.`);
+
+    feeders.forEach(feeder => {
+        console.log("📨 Sending SMS for:", feeder.feederName);
+        sendSMS(feeder.feederName, feeder.scheduledDate);
+    });
+});
+
+console.log("🚀 SMS Reminder Scheduler is Running at 01:30 AM UTC (07:00 AM IST)...");
+
+// Manual Test Route
 app.get('/test-sms', async (req, res) => {
-    try {
-      const feeder = await Feeder.findOne({ feederName: "220KV Gachibowli-4" });
-      if (!feeder) return res.status(404).send("Feeder not found");
-  
-      await sendSMS(feeder.feederName, feeder.scheduledDate);
-      res.send("SMS triggered manually!");
-    } catch (error) {
-      res.status(500).send("Error: " + error.message);
-    }
+    const feeder = await Feeder.findOne();  // Fetch any feeder
+    if (!feeder) return res.status(404).send("No scheduled feeders found.");
+
+    await sendSMS(feeder.feederName, feeder.scheduledDate);
+    res.send("✅ SMS test triggered successfully!");
 });
 
 app.get('/check-env', (req, res) => {
