@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
@@ -17,6 +16,11 @@ const app = express();
 const port = process.env.PORT || 3500;
 const mongoUri = process.env.MONGO_URI;
 
+// Connect to MongoDB
+mongoose.connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('Connected to MongoDB'));
@@ -35,24 +39,15 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'mysecretkey',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: mongoUri, // Ensure this is correctly set
-        collectionName: 'sessions'
-    }),
-    cookie: { maxAge: 1000 * 60 * 60, httpOnly: true, secure: process.env.NODE_ENV === 'production' }
+    cookie: { maxAge: 1000 * 60 * 60, httpOnly: true, secure: false }
 }));
 
 // Passport Configuration
 app.use(passport.initialize());
 app.use(passport.session());
 
-if (!process.env.DEFAULT_PASSWORD) {
-    console.error("❌ DEFAULT_PASSWORD is missing in the .env file!");
-    process.exit(1); // Stop execution to avoid errors
-}
-
-const defaultUsername = process.env.DEFAULT_USERNAME;
-const hashedPassword = bcrypt.hashSync(process.env.DEFAULT_PASSWORD, 10);
+const defaultUsername = 'Shankarpally400kv';
+const hashedPassword = bcrypt.hashSync('Shankarpally@9870', 10);
 
 passport.use(new LocalStrategy((username, password, done) => {
     if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
