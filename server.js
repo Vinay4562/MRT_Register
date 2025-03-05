@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const MongoStore = require("connect-mongo");
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
@@ -35,12 +36,17 @@ app.use(cors({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Session Middleware
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'mysecretkey',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60, httpOnly: true, secure: false }
-}));
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET || 'default_secret', // Fallback value
+        resave: false,
+        saveUninitialized: true,
+        store: MongoStore.create({
+            mongoUrl: mongoUri, // Use the correct MongoDB URI
+        }),
+        cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1-day expiration
+    })
+);
 
 // Passport Configuration
 app.use(passport.initialize());
