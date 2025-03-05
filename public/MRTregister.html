@@ -133,8 +133,8 @@
                             row.innerHTML = `
                                 <td>${index + 1}</td>
                                 <td>${feeder.feederName}</td>
-                                <td>${formatDate(feeder.lastTestedDate)}</td>
-                                <td>${formatDate(feeder.scheduledDate)}</td>
+                                <td>${feeder.lastTestedDate}</td> <!-- Already in DD-MM-YYYY format -->
+                                <td>${feeder.scheduledDate}</td> <!-- Already in DD-MM-YYYY format -->
                                 <td class="${applyStatusClass(feeder.status)}">${feeder.status}</td>
                                 <td>${feeder.remarks || "N/A"}</td>
                                 <td><button class="edit-button">Edit</button></td>
@@ -219,6 +219,10 @@
                 e.preventDefault();
                 const formData = new FormData(editForm);
                 const formObject = Object.fromEntries(formData.entries());
+
+                // Format dates to DD-MM-YYYY
+                formObject.lastTestedDate = moment(formObject.lastTestedDate).format("DD-MM-YYYY");
+                formObject.scheduledDate = moment(formObject.scheduledDate).format("DD-MM-YYYY");
 
                 try {
                     let response;

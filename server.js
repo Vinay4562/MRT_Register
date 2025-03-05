@@ -93,23 +93,37 @@ app.get('/MRTregister.html', (req, res) => {
 // Define Feeder Schema & Model
 const feederSchema = new mongoose.Schema({
     feederName: { type: String, required: true },
-    lastTestedDate: { type: Date, required: true },
-    scheduledDate: { type: Date, required: true },
+    lastTestedDate: { type: String, required: true }, // Store as string
+    scheduledDate: { type: String, required: true },  // Store as string
     status: { type: String, required: true },
     remarks: { type: String }
 });
+
 const Feeder = mongoose.model('Feeder', feederSchema);
+
+// Middleware to validate date format (DD-MM-YYYY)
+const validateDateFormat = (req, res, next) => {
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/; // Regex for DD-MM-YYYY format
+    const { lastTestedDate, scheduledDate } = req.body;
+
+    if (!dateRegex.test(lastTestedDate) || !dateRegex.test(scheduledDate)) {
+        return res.status(400).json({ message: 'Invalid date format. Use DD-MM-YYYY.' });
+    }
+
+    next(); // Proceed to the next middleware/route handler
+};
 
 // CRUD Routes for Feeders
 app.get('/feeders', async (req, res) => {
     try {
-        res.json(await Feeder.find());
+        const feeders = await Feeder.find();
+        res.json(feeders);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-app.post('/feeders', async (req, res) => {
+app.post('/feeders', validateDateFormat, async (req, res) => {
     try {
         const feeder = new Feeder(req.body);
         await feeder.save();
@@ -119,7 +133,7 @@ app.post('/feeders', async (req, res) => {
     }
 });
 
-app.put('/feeders/:id', async (req, res) => {
+app.put('/feeders/:id', validateDateFormat, async (req, res) => {
     try {
         const updatedFeeder = await Feeder.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         updatedFeeder ? res.json(updatedFeeder) : res.status(404).json({ message: 'Feeder not found' });
