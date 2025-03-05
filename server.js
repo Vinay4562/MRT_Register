@@ -151,19 +151,17 @@ app.delete('/feeders/:id', async (req, res) => {
     }
 });
 
+// ✅ Function to Parse DD-MM-YYYY format
 function parseDDMMYYYY(dateString) {
     if (!dateString) return null;
 
     const [day, month, year] = dateString.split('-').map(Number);
-    if (isNaN(day) || isNaN(month) || isNaN(year)) {
-        return null; // Invalid date
-    }
+    if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
 
-    // Months are 0-based in JavaScript
-    return new Date(year, month - 1, day);
+    return new Date(year, month - 1, day); // Months are 0-based
 }
 
-// Nodemailer Setup
+// ✅ Nodemailer Setup
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -172,6 +170,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// ✅ Send Email Function
 async function sendEmail(feederName, scheduledDate) {
     const mailOptions = {
         from: process.env.EMAIL_USER,
@@ -181,74 +180,100 @@ async function sendEmail(feederName, scheduledDate) {
     };
 
     try {
-        await transporter.sendMail(mailOptions);
-        console.log(`✅ Email sent successfully for ${feederName}`);
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`✅ Email sent for ${feederName}: ${info.messageId}`);
     } catch (error) {
-        console.error("❌ Error sending email:", error);
+        console.error(`❌ Error sending email for ${feederName}:`, error);
     }
 }
 
-// Twilio SMS Reminder
+// ✅ Twilio SMS Setup
 const twilioClient = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
+// ✅ Send SMS Function
 async function sendSMS(feederName, scheduledDate) {
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
-        console.error("❌ Twilio credentials are missing! Check your .env file.");
+        console.error("❌ Twilio credentials missing! Check .env file.");
         return;
     }
 
     try {
         const message = await twilioClient.messages.create({
-            body: `Reminder: Next Testing Date for ${feederName} is on ${scheduledDate}. Please be prepared.`,
+            body: `Reminder: MRT Testing for ${feederName} is scheduled on ${scheduledDate}. Please prepare accordingly.`,
             from: process.env.TWILIO_PHONE_NUMBER,
             to: process.env.ADMIN_PHONE_NUMBER
         });
-        console.log(`✅ SMS sent successfully for ${feederName}. SID: ${message.sid}`);
+        console.log(`✅ SMS sent for ${feederName}. SID: ${message.sid}`);
     } catch (error) {
-        console.error("❌ Error sending SMS:", error);
+        console.error(`❌ Error sending SMS for ${feederName}:`, error);
     }
 }
 
-// Reusable function to get feeders scheduled for today
+// ✅ Fetch Feeders Scheduled for Today
 async function getFeedersScheduledForToday() {
     const today = new Date();
-    today.setUTCHours(0, 0, 0, 0); // Start of the day (UTC)
+    today.setUTCHours(0, 0, 0, 0); // Normalize to start of today
 
-    const tomorrow = new Date(today);
-    tomorrow.setUTCDate(today.getUTCDate() + 1); // Start of the next day
+    console.log("🗓️ Checking Feeders for:", today.toISOString());
 
-    console.log("🔍 Querying for scheduledDate between:", today.toISOString(), "and", tomorrow.toISOString());
+    try {
+        const feeders = await Feeder.find(); // Fetch all feeders from DB
 
-    const feeders = await Feeder.find();
+        // Filter feeders scheduled for today with 'Pending' or 'Incomplete' status
+        const feedersForToday = feeders.filter(feeder => {
+            const scheduledDate = parseDDMMYYYY(feeder.scheduledDate);
 
-    // Filter feeders scheduled for today
-    const feedersForToday = feeders.filter(feeder => {
-        const scheduledDate = parseDDMMYYYY(feeder.scheduledDate);
-        return scheduledDate >= today && scheduledDate < tomorrow;
-    });
+            if (!scheduledDate) return false;
+            scheduledDate.setUTCHours(0, 0, 0, 0); // Normalize to midnight
 
-    console.log(`📢 Found ${feedersForToday.length} feeders scheduled for today.`);
-    return feedersForToday;
+            return scheduledDate.getTime() === today.getTime() &&
+                   (feeder.status === "Pending" || feeder.status === "Incomplete");
+        });
+
+        console.log(`📢 Found ${feedersForToday.length} feeders scheduled for today.`);
+        return feedersForToday;
+    } catch (error) {
+        console.error("❌ Error fetching feeders:", error);
+        return [];
+    }
 }
 
-// Email Reminder Cron Job
-cron.schedule('0 7 * * *', async () => {  // Runs at 07:00 AM UTC daily
-    console.log("🚀 Running email reminder cron job...");
-    const feeders = await getFeedersScheduledForToday();
-    feeders.forEach(feeder => {
-        console.log("📨 Sending email for:", feeder.feederName);
-        sendEmail(feeder.feederName, feeder.scheduledDate);
-    });
+module.exports = { getFeedersScheduledForToday };
+
+// ✅ Email Reminder Cron Job (Runs at 07:00 AM UTC daily)
+cron.schedule('0 7 * * *', async () => {
+    console.log("🚀 Running Email Reminder Job...");
+
+    try {
+        const feeders = await getFeedersScheduledForToday();
+        if (feeders.length === 0) {
+            console.log("✅ No feeders scheduled for today.");
+            return;
+        }
+
+        // Send emails asynchronously in parallel
+        await Promise.all(feeders.map(feeder => sendEmail(feeder.feederName, feeder.scheduledDate)));
+    } catch (error) {
+        console.error("❌ Error in email cron job:", error);
+    }
 });
 
-// SMS Reminder Cron Job
-cron.schedule('30 1 * * *', async () => {  // Runs at 01:30 AM UTC (07:00 AM IST)
-    console.log("🚀 Running SMS reminder cron job...");
-    const feeders = await getFeedersScheduledForToday();
-    feeders.forEach(feeder => {
-        console.log("📨 Sending SMS for:", feeder.feederName);
-        sendSMS(feeder.feederName, feeder.scheduledDate);
-    });
+// ✅ SMS Reminder Cron Job (Runs at 01:30 AM UTC / 07:00 AM IST)
+cron.schedule('30 1 * * *', async () => {
+    console.log("🚀 Running SMS Reminder Job...");
+
+    try {
+        const feeders = await getFeedersScheduledForToday();
+        if (feeders.length === 0) {
+            console.log("✅ No feeders scheduled for today.");
+            return;
+        }
+
+        // Send SMS asynchronously in parallel
+        await Promise.all(feeders.map(feeder => sendSMS(feeder.feederName, feeder.scheduledDate)));
+    } catch (error) {
+        console.error("❌ Error in SMS cron job:", error);
+    }
 });
 
 console.log("🚀 Reminder Schedulers are Running...");
