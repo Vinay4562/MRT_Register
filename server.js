@@ -151,6 +151,18 @@ app.delete('/feeders/:id', async (req, res) => {
     }
 });
 
+function parseDDMMYYYY(dateString) {
+    if (!dateString) return null;
+
+    const [day, month, year] = dateString.split('-').map(Number);
+    if (isNaN(day) || isNaN(month) || isNaN(year)) {
+        return null; // Invalid date
+    }
+
+    // Months are 0-based in JavaScript
+    return new Date(year, month - 1, day);
+}
+
 // Nodemailer Setup
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -170,45 +182,21 @@ async function sendEmail(feederName, scheduledDate) {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`Email sent successfully for ${feederName}`);
+        console.log(`✅ Email sent successfully for ${feederName}`);
     } catch (error) {
-        console.error("Error sending email:", error);
+        console.error("❌ Error sending email:", error);
     }
 }
-
-cron.schedule('0 7 * * *', async () => {  // Runs at 07:00 AM UTC daily
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);  // Convert to UTC midnight
-
-    const startOfDay = new Date(today);
-    const endOfDay = new Date(today);
-    endOfDay.setUTCHours(23, 59, 59, 999);  // Ensure full day range
-
-    console.log("Checking for scheduled tests on:", today.toISOString());
-
-    const feeders = await Feeder.find({
-        scheduledDate: { $gte: startOfDay, $lte: endOfDay }  // Matches all times within the day
-    });
-
-    console.log(`Found ${feeders.length} feeders scheduled for today.`);
-
-    feeders.forEach(feeder => {
-        console.log("Sending email for:", feeder.feederName);
-        sendEmail(feeder.feederName, feeder.scheduledDate);
-    });
-});
-
-console.log("🚀 Email Reminder Scheduler set for 07:00 AM UTC...");
 
 // Twilio SMS Reminder
 const twilioClient = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 async function sendSMS(feederName, scheduledDate) {
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
-        console.error("Twilio credentials are missing! Check your .env file.");
+        console.error("❌ Twilio credentials are missing! Check your .env file.");
         return;
     }
-    
+
     try {
         const message = await twilioClient.messages.create({
             body: `Reminder: Next Testing Date for ${feederName} is on ${scheduledDate}. Please be prepared.`,
@@ -221,28 +209,49 @@ async function sendSMS(feederName, scheduledDate) {
     }
 }
 
-cron.schedule('30 1 * * *', async () => {  // Runs at 01:30 AM UTC (07:00 AM IST)
+// Reusable function to get feeders scheduled for today
+async function getFeedersScheduledForToday() {
     const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    today.setUTCHours(0, 0, 0, 0); // Start of the day (UTC)
 
     const tomorrow = new Date(today);
-    tomorrow.setUTCDate(today.getUTCDate() + 1); // Move to next day
+    tomorrow.setUTCDate(today.getUTCDate() + 1); // Start of the next day
 
-    console.log("🔍 Cron job running. Querying for scheduledDate:", today.toISOString());
+    console.log("🔍 Querying for scheduledDate between:", today.toISOString(), "and", tomorrow.toISOString());
 
-    const feeders = await Feeder.find({
-        scheduledDate: { $gte: today, $lt: tomorrow }  // Match entire UTC day
+    const feeders = await Feeder.find();
+
+    // Filter feeders scheduled for today
+    const feedersForToday = feeders.filter(feeder => {
+        const scheduledDate = parseDDMMYYYY(feeder.scheduledDate);
+        return scheduledDate >= today && scheduledDate < tomorrow;
     });
 
-    console.log(`📢 Found ${feeders.length} feeders scheduled for today.`);
+    console.log(`📢 Found ${feedersForToday.length} feeders scheduled for today.`);
+    return feedersForToday;
+}
 
+// Email Reminder Cron Job
+cron.schedule('0 7 * * *', async () => {  // Runs at 07:00 AM UTC daily
+    console.log("🚀 Running email reminder cron job...");
+    const feeders = await getFeedersScheduledForToday();
+    feeders.forEach(feeder => {
+        console.log("📨 Sending email for:", feeder.feederName);
+        sendEmail(feeder.feederName, feeder.scheduledDate);
+    });
+});
+
+// SMS Reminder Cron Job
+cron.schedule('30 1 * * *', async () => {  // Runs at 01:30 AM UTC (07:00 AM IST)
+    console.log("🚀 Running SMS reminder cron job...");
+    const feeders = await getFeedersScheduledForToday();
     feeders.forEach(feeder => {
         console.log("📨 Sending SMS for:", feeder.feederName);
         sendSMS(feeder.feederName, feeder.scheduledDate);
     });
 });
 
-console.log("🚀 SMS Reminder Scheduler is Running at 01:30 AM UTC (07:00 AM IST)...");
+console.log("🚀 Reminder Schedulers are Running...");
 
 // Manual Test Route
 app.get('/test-sms', async (req, res) => {
