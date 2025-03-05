@@ -17,6 +17,8 @@ const app = express();
 const port = process.env.PORT || 3500;
 const mongoUri = process.env.MONGO_URI;
 
+module.exports = app;
+
 // Check if MongoDB URI is available
 if (!mongoUri) {
     console.error("❌ MONGODB_URI is not defined in environment variables.");
