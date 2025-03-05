@@ -251,8 +251,6 @@ async function getFeedersScheduledForToday() {
     }
 }
 
-module.exports = { getFeedersScheduledForToday };
-
 // ✅ Email Reminder Cron Job (Runs at 07:00 AM UTC daily)
 cron.schedule('0 7 * * *', async () => {
     console.log("🚀 Running Email Reminder Job...");
