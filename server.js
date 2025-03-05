@@ -17,12 +17,19 @@ const app = express();
 const port = process.env.PORT || 3500;
 const mongoUri = process.env.MONGO_URI;
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI);
+// Check if MongoDB URI is available
+if (!mongoUri) {
+    console.error("❌ MONGODB_URI is not defined in environment variables.");
+    process.exit(1);
+}
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => console.log('Connected to MongoDB'));
+// Connect to MongoDB
+mongoose.connect(mongoUri)
+    .then(() => console.log("✅ Connected to MongoDB"))
+    .catch(err => {
+        console.error("❌ MongoDB connection error:", err);
+        process.exit(1);
+    });
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -36,13 +43,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Session Middleware
 app.use(
     session({
-        secret: process.env.SESSION_SECRET,
+        secret: process.env.SESSION_SECRET || 'default_secret', // Fallback value
         resave: false,
         saveUninitialized: true,
         store: MongoStore.create({
-            mongoUrl: process.env.MONGODB_URI, // Use your MongoDB connection string
+            mongoUrl: mongoUri, // Use the correct MongoDB URI
         }),
-        cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1 day expiration
+        cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1-day expiration
     })
 );
 
