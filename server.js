@@ -245,43 +245,37 @@ async function getFeedersScheduledForToday() {
 // ✅ Email Reminder Cron Job (Runs at 07:00 AM UTC daily)
 cron.schedule('0 7 * * *', async () => {
     console.log("🚀 Running Email Reminder Job...");
+
     try {
         const feeders = await getFeedersScheduledForToday();
         if (feeders.length === 0) {
             console.log("✅ No feeders scheduled for today.");
             return;
         }
+
+        // Send emails asynchronously in parallel
         await Promise.all(feeders.map(feeder => sendEmail(feeder.feederName, feeder.scheduledDate)));
     } catch (error) {
         console.error("❌ Error in email cron job:", error);
-        await sendEmail(
-            "Cron Job Failure",
-            `Email reminder job failed at ${new Date().toISOString()}. Error: ${error.message}`
-        );
     }
-}, {
-    timezone: "Asia/Kolkata"
 });
 
 // ✅ SMS Reminder Cron Job (Runs at 01:30 AM UTC / 07:00 AM IST)
-cron.schedule('0 7 * * *', async () => {
+cron.schedule('30 1 * * *', async () => {
     console.log("🚀 Running SMS Reminder Job...");
+
     try {
         const feeders = await getFeedersScheduledForToday();
         if (feeders.length === 0) {
             console.log("✅ No feeders scheduled for today.");
             return;
         }
+
+        // Send SMS asynchronously in parallel
         await Promise.all(feeders.map(feeder => sendSMS(feeder.feederName, feeder.scheduledDate)));
     } catch (error) {
         console.error("❌ Error in SMS cron job:", error);
-        await sendEmail(
-            "Cron Job Failure",
-            `SMS reminder job failed at ${new Date().toISOString()}. Error: ${error.message}`
-        );
     }
-}, {
-    timezone: "Asia/Kolkata"
 });
 
 console.log("🚀 Reminder Schedulers are Running...");
@@ -293,14 +287,6 @@ app.get('/test-sms', async (req, res) => {
 
     await sendSMS(feeder.feederName, feeder.scheduledDate);
     res.send("✅ SMS test triggered successfully!");
-});
-
-// Manual Test Route for Email (Add this below /test-sms)
-app.get('/test-email', async (req, res) => {
-    const feeder = await Feeder.findOne();
-    if (!feeder) return res.status(404).send("No scheduled feeders found.");
-    await sendEmail(feeder.feederName, feeder.scheduledDate);
-    res.send("✅ Email test triggered successfully!");
 });
 
 app.get('/check-env', (req, res) => {
