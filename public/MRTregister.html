@@ -23,6 +23,9 @@
         <button id="logoutButton">Logout</button>
     </div>
 
+    <button id="test-sms-button">Test SMS</button>
+    <button id="test-email-button">Test Email</button>
+
     <h2>MRT Testing Details Schedule Page</h2>
 
     <div class="table-container">
@@ -37,6 +40,7 @@
                     <th>Remarks</th>
                     <th>Edit</th>
                     <th>Delete</th>
+                    <th>Last Notified</th>
                 </tr>
             </thead>
             <tbody>
@@ -137,6 +141,7 @@
                                 <td>${feeder.scheduledDate}</td> <!-- Already in DD-MM-YYYY format -->
                                 <td class="${applyStatusClass(feeder.status)}">${feeder.status}</td>
                                 <td>${feeder.remarks || "N/A"}</td>
+                                <td>${feeder.lastNotified || "N/A"}</td>
                                 <td><button class="edit-button">Edit</button></td>
                                 <td><button class="delete-button">Delete</button></td>
                             `;
@@ -150,6 +155,11 @@
                     dataTable.innerHTML = "<tr><td colspan='8'>Error loading data</td></tr>";
                 }
             };
+
+            const today = moment().format("DD-MM-YYYY");
+            if (feeder.scheduledDate === today && ["Pending", "Incomplete"].includes(feeder.status)) {
+                row.classList.add("scheduled-today");
+            }
 
             // Event delegation for edit buttons
             dataTable.addEventListener("click", (e) => {
@@ -254,6 +264,26 @@
                 } catch (error) {
                     console.error("Error:", error);
                     showPopup("Error saving feeder", true);
+                }
+            });
+
+            document.getElementById("test-sms-button").addEventListener("click", async () => {
+                try {
+                    const response = await fetch("https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/test-sms", { credentials: "include" });
+                    if (response.ok) showPopup("SMS test triggered!");
+                    else throw new Error("SMS test failed");
+                } catch (error) {
+                    showPopup("Error triggering SMS test", true);
+                }
+            });
+
+            document.getElementById("test-email-button").addEventListener("click", async () => {
+                try {
+                    const response = await fetch("https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app/test-email", { credentials: "include" });
+                    if (response.ok) showPopup("Email test triggered!");
+                    else throw new Error("Email test failed");
+                } catch (error) {
+                    showPopup("Error triggering email test", true);
                 }
             });
 
