@@ -97,10 +97,11 @@ app.get('/MRTregister.html', (req, res) => {
 // Define Feeder Schema & Model
 const feederSchema = new mongoose.Schema({
     feederName: { type: String, required: true },
-    lastTestedDate: { type: String, required: true }, // Store as string
-    scheduledDate: { type: String, required: true },  // Store as string
+    lastTestedDate: { type: String, required: true },
+    scheduledDate: { type: String, required: true },
     status: { type: String, required: true },
-    remarks: { type: String }
+    remarks: { type: String },
+    lastNotified: { type: String } // Add this field
 });
 
 const Feeder = mongoose.model('Feeder', feederSchema);
@@ -174,7 +175,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// ✅ Send Email Function
 async function sendEmail(feederName, scheduledDate) {
     const mailOptions = {
         from: process.env.EMAIL_USER,
@@ -186,6 +186,10 @@ async function sendEmail(feederName, scheduledDate) {
     try {
         const info = await transporter.sendMail(mailOptions);
         console.log(`✅ Email sent for ${feederName}: ${info.messageId}`);
+        await Feeder.updateMany(
+            { feederName, scheduledDate },
+            { lastNotified: new Date().toISOString() }
+        );
     } catch (error) {
         console.error(`❌ Error sending email for ${feederName}:`, error);
     }
@@ -194,7 +198,7 @@ async function sendEmail(feederName, scheduledDate) {
 // ✅ Twilio SMS Setup
 const twilioClient = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-// ✅ Send SMS Function
+// Update sendSMS to save lastNotified
 async function sendSMS(feederName, scheduledDate) {
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
         console.error("❌ Twilio credentials missing! Check .env file.");
@@ -208,6 +212,10 @@ async function sendSMS(feederName, scheduledDate) {
             to: process.env.ADMIN_PHONE_NUMBER
         });
         console.log(`✅ SMS sent for ${feederName}. SID: ${message.sid}`);
+        await Feeder.updateMany(
+            { feederName, scheduledDate },
+            { lastNotified: new Date().toISOString() }
+        );
     } catch (error) {
         console.error(`❌ Error sending SMS for ${feederName}:`, error);
     }

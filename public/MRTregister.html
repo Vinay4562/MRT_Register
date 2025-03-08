@@ -129,6 +129,7 @@
                     console.log("Fetched data:", data);
 
                     dataTable.innerHTML = ""; // Clear table first
+                    const today = moment().format("DD-MM-YYYY");
 
                     if (data.length > 0) {
                         data.forEach((feeder, index) => {
@@ -137,29 +138,28 @@
                             row.innerHTML = `
                                 <td>${index + 1}</td>
                                 <td>${feeder.feederName}</td>
-                                <td>${feeder.lastTestedDate}</td> <!-- Already in DD-MM-YYYY format -->
-                                <td>${feeder.scheduledDate}</td> <!-- Already in DD-MM-YYYY format -->
+                                <td>${feeder.lastTestedDate}</td>
+                                <td>${feeder.scheduledDate}</td>
                                 <td class="${applyStatusClass(feeder.status)}">${feeder.status}</td>
                                 <td>${feeder.remarks || "N/A"}</td>
-                                <td>${feeder.lastNotified || "N/A"}</td>
+                                <td>${feeder.lastNotified ? moment(feeder.lastNotified).format("DD-MM-YYYY HH:mm") : "N/A"}</td>
                                 <td><button class="edit-button">Edit</button></td>
                                 <td><button class="delete-button">Delete</button></td>
                             `;
+                            // Highlight today's scheduled feeders
+                            if (feeder.scheduledDate === today && ["Pending", "Incomplete"].includes(feeder.status)) {
+                                row.classList.add("scheduled-today");
+                            }
                             dataTable.appendChild(row);
                         });
                     } else {
-                        dataTable.innerHTML = "<tr><td colspan='8'>No data available</td></tr>";
+                        dataTable.innerHTML = "<tr><td colspan='9'>No data available</td></tr>";
                     }
                 } catch (error) {
                     console.error("Error:", error);
-                    dataTable.innerHTML = "<tr><td colspan='8'>Error loading data</td></tr>";
+                    dataTable.innerHTML = "<tr><td colspan='9'>Error loading data</td></tr>";
                 }
             };
-
-            const today = moment().format("DD-MM-YYYY");
-            if (feeder.scheduledDate === today && ["Pending", "Incomplete"].includes(feeder.status)) {
-                row.classList.add("scheduled-today");
-            }
 
             // Event delegation for edit buttons
             dataTable.addEventListener("click", (e) => {
