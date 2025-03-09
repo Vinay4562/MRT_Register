@@ -47,8 +47,7 @@ body {
     border-radius: 4px;
 }
 
-/* In LCboxstyles.css */
-.scheduled-today {
+.scheduled-tomorrow {
     background-color: #ffeb3b; /* Yellow highlight */
 }
 
