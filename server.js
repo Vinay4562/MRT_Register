@@ -253,6 +253,45 @@ async function getFeedersScheduledForTomorrow() {
     }
 }
 
+// ✅ Fetch Overdue Pending Feeders and Update to Incomplete
+async function updateOverdueFeeders() {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0); // Normalize to start of today
+
+    console.log("🗓️ Checking for overdue feeders on:", today.toISOString());
+
+    try {
+        const feeders = await Feeder.find({ status: "Pending" }); // Fetch all Pending feeders
+
+        // Filter feeders whose scheduledDate is before today
+        const overdueFeeders = feeders.filter(feeder => {
+            const scheduledDate = parseDDMMYYYY(feeder.scheduledDate);
+            if (!scheduledDate) return false;
+            scheduledDate.setUTCHours(0, 0, 0, 0); // Normalize to midnight
+            return scheduledDate.getTime() < today.getTime(); // Past due
+        });
+
+        if (overdueFeeders.length > 0) {
+            // Update all overdue feeders to Incomplete
+            await Promise.all(overdueFeeders.map(feeder =>
+                Feeder.updateOne(
+                    { _id: feeder._id },
+                    { status: "Incomplete" }
+                )
+            ));
+            console.log(`✅ Updated ${overdueFeeders.length} overdue feeders to Incomplete.`);
+        } else {
+            console.log("✅ No overdue feeders found.");
+        }
+    } catch (error) {
+        console.error("❌ Error updating overdue feeders:", error);
+        await sendEmail(
+            "Cron Job Failure",
+            `Overdue feeder update job failed at ${new Date().toISOString()}. Error: ${error.message}`
+        );
+    }
+}
+
 // ✅ Email Reminder Cron Job (updated to use tomorrow's feeders)
 cron.schedule('0 7 * * *', async () => {
     console.log("🚀 Running Email Reminder Job (1 day prior)...");
@@ -274,7 +313,7 @@ cron.schedule('0 7 * * *', async () => {
     timezone: "Asia/Kolkata"
 });
 
-// ✅ SMS Reminder Cron Job (updated to use tomorrow's feeders)
+// ✅ SMS Reminder Cron Job (unchanged from your 1-day-prior version)
 cron.schedule('0 7 * * *', async () => {
     console.log("🚀 Running SMS Reminder Job (1 day prior)...");
     try {
@@ -291,6 +330,14 @@ cron.schedule('0 7 * * *', async () => {
             `SMS reminder job failed at ${new Date().toISOString()}. Error: ${error.message}`
         );
     }
+}, {
+    timezone: "Asia/Kolkata"
+});
+
+// ✅ New Cron Job to Update Overdue Feeders
+cron.schedule('0 7 * * *', async () => {
+    console.log("🚀 Running Overdue Feeder Update Job...");
+    await updateOverdueFeeders();
 }, {
     timezone: "Asia/Kolkata"
 });

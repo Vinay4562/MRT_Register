@@ -129,7 +129,8 @@
                     console.log("Fetched data:", data);
 
                     dataTable.innerHTML = "";
-                    const tomorrow = moment().add(1, 'days').format("DD-MM-YYYY"); // Changed to tomorrow
+                    const today = moment().format("DD-MM-YYYY");
+                    const tomorrow = moment().add(1, 'days').format("DD-MM-YYYY");
 
                     if (data.length > 0) {
                         data.forEach((feeder, index) => {
@@ -149,6 +150,10 @@
                             // Highlight feeders scheduled for tomorrow
                             if (feeder.scheduledDate === tomorrow && ["Pending", "Incomplete"].includes(feeder.status)) {
                                 row.classList.add("scheduled-tomorrow");
+                            }
+                            // Highlight overdue Incomplete feeders in red
+                            if (feeder.status === "Incomplete" && moment(feeder.scheduledDate, "DD-MM-YYYY").isBefore(today)) {
+                                row.classList.add("overdue-incomplete");
                             }
                             dataTable.appendChild(row);
                         });
