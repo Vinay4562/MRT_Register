@@ -128,8 +128,8 @@
                     const data = await response.json();
                     console.log("Fetched data:", data);
 
-                    dataTable.innerHTML = ""; // Clear table first
-                    const today = moment().format("DD-MM-YYYY");
+                    dataTable.innerHTML = "";
+                    const tomorrow = moment().add(1, 'days').format("DD-MM-YYYY"); // Changed to tomorrow
 
                     if (data.length > 0) {
                         data.forEach((feeder, index) => {
@@ -146,9 +146,9 @@
                                 <td><button class="edit-button">Edit</button></td>
                                 <td><button class="delete-button">Delete</button></td>
                             `;
-                            // Highlight today's scheduled feeders
-                            if (feeder.scheduledDate === today && ["Pending", "Incomplete"].includes(feeder.status)) {
-                                row.classList.add("scheduled-today");
+                            // Highlight feeders scheduled for tomorrow
+                            if (feeder.scheduledDate === tomorrow && ["Pending", "Incomplete"].includes(feeder.status)) {
+                                row.classList.add("scheduled-tomorrow");
                             }
                             dataTable.appendChild(row);
                         });
