@@ -346,11 +346,15 @@ console.log("🚀 Reminder Schedulers are Running...");
 
 // Manual Test Route
 app.get('/test-sms', async (req, res) => {
-    const feeder = await Feeder.findOne();  // Fetch any feeder
+    const feeder = await Feeder.findOne();
     if (!feeder) return res.status(404).send("No scheduled feeders found.");
-
-    await sendSMS(feeder.feederName, feeder.scheduledDate);
-    res.send("✅ SMS test triggered successfully!");
+    try {
+        await sendSMS(feeder.feederName, feeder.scheduledDate);
+        res.send("✅ SMS test triggered successfully!");
+    } catch (error) {
+        console.error("SMS Error:", error);
+        res.status(500).send("❌ Failed to send SMS: " + error.message);
+    }
 });
 
 // Manual Test Route for Email (Add this below /test-sms)
@@ -362,6 +366,7 @@ app.get('/test-email', async (req, res) => {
 });
 
 app.get('/check-env', (req, res) => {
+    console.log("Environment Variables:", process.env);
     res.json({
         ADMIN_PHONE_NUMBER: process.env.ADMIN_PHONE_NUMBER,
         TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER
