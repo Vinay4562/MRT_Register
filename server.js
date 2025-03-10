@@ -342,26 +342,16 @@ console.log("🚀 Reminder Schedulers are Running...");
 
 // Manual Test Route
 app.get('/test-sms', async (req, res) => {
-    console.log("Environment Variables:", {
-        TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
-        TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
-        TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER,
-        ADMIN_PHONE_NUMBER: process.env.ADMIN_PHONE_NUMBER
-    });
-
     const feeder = await Feeder.findOne();
     if (!feeder) {
-        console.error("❌ No feeders found in the database.");
         return res.status(404).send("No scheduled feeders found.");
     }
 
     try {
-        console.log("📤 Attempting to send SMS...");
         await sendSMS(feeder.feederName, feeder.scheduledDate);
-        console.log("✅ SMS test triggered successfully!");
         res.send("✅ SMS test triggered successfully!");
     } catch (error) {
-        console.error("❌ SMS Error:", error);
+        console.error("SMS Error:", error);
         res.status(500).send("❌ Failed to send SMS: " + error.message);
     }
 });
