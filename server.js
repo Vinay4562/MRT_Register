@@ -201,11 +201,6 @@ const twilioClient = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWIL
 
 // ✅ Send SMS Function (updated message)
 async function sendSMS(feederName, scheduledDate) {
-    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
-        console.error("❌ Twilio credentials missing! Check .env file.");
-        return;
-    }
-
     try {
         const message = await twilioClient.messages.create({
             body: `Reminder: MRT Testing for ${feederName} is scheduled for tomorrow, ${scheduledDate}. Please prepare accordingly.`,
@@ -213,12 +208,9 @@ async function sendSMS(feederName, scheduledDate) {
             to: process.env.ADMIN_PHONE_NUMBER
         });
         console.log(`✅ SMS sent for ${feederName}. SID: ${message.sid}`);
-        await Feeder.updateMany(
-            { feederName, scheduledDate },
-            { lastNotified: new Date().toISOString() }
-        );
     } catch (error) {
         console.error(`❌ Error sending SMS for ${feederName}:`, error);
+        throw error;
     }
 }
 
@@ -347,7 +339,10 @@ console.log("🚀 Reminder Schedulers are Running...");
 // Manual Test Route
 app.get('/test-sms', async (req, res) => {
     const feeder = await Feeder.findOne();
-    if (!feeder) return res.status(404).send("No scheduled feeders found.");
+    if (!feeder) {
+        return res.status(404).send("No scheduled feeders found.");
+    }
+
     try {
         await sendSMS(feeder.feederName, feeder.scheduledDate);
         res.send("✅ SMS test triggered successfully!");
