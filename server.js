@@ -369,10 +369,19 @@ app.get('/server-time', (req, res) => {
     res.send(`Server time: ${new Date().toString()}`);
 });
 
+// 404 Middleware
+app.use((req, res, next) => {
+    res.status(404).json({
+        message: "🚀 Route not found!",
+        path: req.path,
+        method: req.method
+    });
+});
+
 // General error handler
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Something went wrong!');
+    res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });
 
 app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
