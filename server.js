@@ -18,11 +18,9 @@ const port = process.env.PORT || 3500;
 const mongoUri = process.env.MONGO_URI;
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => console.log("✅ Connected to MongoDB"))
-  .catch(err => console.error("❌ MongoDB Connection Error:", err));
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("✅ Connected to MongoDB"))
+    .catch(err => console.error("❌ MongoDB Connection Error:", err));
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -36,13 +34,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Session Middleware
 app.use(
     session({
-        secret: process.env.SESSION_SECRET || 'default_secret', // Fallback value
+        secret: process.env.SESSION_SECRET || 'default_secret',
         resave: false,
         saveUninitialized: true,
-        store: MongoStore.create({
-            mongoUrl: mongoUri, // Use the correct MongoDB URI
-        }),
-        cookie: { maxAge: 1000 * 60 * 60 * 24 }, // 1-day expiration
+        store: MongoStore.create({ mongoUrl: mongoUri }),
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24, // 1-day expiration
+            name: 'mrt_session' // Unique session cookie name
+        }
     })
 );
 
@@ -54,6 +53,9 @@ const defaultUsername = 'Shankarpally400kv';
 const hashedPassword = bcrypt.hashSync('Shankarpally@9870', 10);
 
 passport.use(new LocalStrategy((username, password, done) => {
+    if (!username || !password) {
+        return done(null, false, { message: 'Username and password are required' });
+    }
     if (username === defaultUsername && bcrypt.compareSync(password, hashedPassword)) {
         return done(null, { username });
     }
@@ -163,7 +165,12 @@ function parseDDMMYYYY(dateString) {
     const [day, month, year] = dateString.split('-').map(Number);
     if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
 
-    return new Date(year, month - 1, day); // Months are 0-based
+    const date = new Date(year, month - 1, day);
+    if (date.getFullYear() !== year || date.getMonth() + 1 !== month || date.getDate() !== day) {
+        return null; // Invalid date
+    }
+
+    return date;
 }
 
 // ✅ Nodemailer Setup (unchanged)
@@ -288,55 +295,30 @@ async function updateOverdueFeeders() {
     }
 }
 
-// ✅ Email Reminder Cron Job (updated to use tomorrow's feeders)
 cron.schedule('0 7 * * *', async () => {
-    console.log("🚀 Running Email Reminder Job (1 day prior)...");
+    console.log("🚀 Running Daily Reminder Job...");
     try {
+        // Update overdue feeders
+        await updateOverdueFeeders();
+
+        // Send reminders for feeders scheduled for tomorrow
         const feeders = await getFeedersScheduledForTomorrow();
-        if (feeders.length === 0) {
+        if (feeders.length > 0) {
+            await Promise.all([
+                ...feeders.map(feeder => sendEmail(feeder.feederName, feeder.scheduledDate)),
+                ...feeders.map(feeder => sendSMS(feeder.feederName, feeder.scheduledDate))
+            ]);
+        } else {
             console.log("✅ No feeders scheduled for tomorrow.");
-            return;
         }
-        await Promise.all(feeders.map(feeder => sendEmail(feeder.feederName, feeder.scheduledDate)));
     } catch (error) {
-        console.error("❌ Error in email cron job:", error);
+        console.error("❌ Error in daily reminder job:", error);
         await sendEmail(
             "Cron Job Failure",
-            `Email reminder job failed at ${new Date().toISOString()}. Error: ${error.message}`
+            `Daily reminder job failed at ${new Date().toISOString()}. Error: ${error.message}`
         );
     }
-}, {
-    timezone: "Asia/Kolkata"
-});
-
-// ✅ SMS Reminder Cron Job (unchanged from your 1-day-prior version)
-cron.schedule('0 7 * * *', async () => {
-    console.log("🚀 Running SMS Reminder Job (1 day prior)...");
-    try {
-        const feeders = await getFeedersScheduledForTomorrow();
-        if (feeders.length === 0) {
-            console.log("✅ No feeders scheduled for tomorrow.");
-            return;
-        }
-        await Promise.all(feeders.map(feeder => sendSMS(feeder.feederName, feeder.scheduledDate)));
-    } catch (error) {
-        console.error("❌ Error in SMS cron job:", error);
-        await sendEmail(
-            "Cron Job Failure",
-            `SMS reminder job failed at ${new Date().toISOString()}. Error: ${error.message}`
-        );
-    }
-}, {
-    timezone: "Asia/Kolkata"
-});
-
-// ✅ New Cron Job to Update Overdue Feeders
-cron.schedule('0 7 * * *', async () => {
-    console.log("🚀 Running Overdue Feeder Update Job...");
-    await updateOverdueFeeders();
-}, {
-    timezone: "Asia/Kolkata"
-});
+}, { timezone: "Asia/Kolkata" });
 
 console.log("🚀 Reminder Schedulers are Running...");
 
@@ -362,6 +344,16 @@ app.get('/test-email', async (req, res) => {
     if (!feeder) return res.status(404).send("No scheduled feeders found.");
     await sendEmail(feeder.feederName, feeder.scheduledDate);
     res.send("✅ Email test triggered successfully!");
+});
+
+app.get('/test-overdue', async (req, res) => {
+    try {
+        await updateOverdueFeeders();
+        res.send("✅ Overdue feeder update triggered successfully!");
+    } catch (error) {
+        console.error("Overdue Feeder Error:", error);
+        res.status(500).send("❌ Failed to update overdue feeders: " + error.message);
+    }
 });
 
 app.get('/check-env', (req, res) => {
