@@ -9,6 +9,7 @@ const path = require('path');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const cron = require('node-cron');
+const cronParser = require('cron-parser').default;
 const nodemailer = require('nodemailer');
 const twilio = require('twilio');
 require('dotenv').config();
@@ -295,8 +296,12 @@ async function updateOverdueFeeders() {
     }
 }
 
+// Track last cron job run time
+let lastCronRun = null;
+
 cron.schedule('0 7 * * *', async () => {
     console.log("🚀 Running Daily Reminder Job...");
+    lastCronRun = new Date(); // Track last run time
     try {
         // Update overdue feeders
         await updateOverdueFeeders();
@@ -304,10 +309,29 @@ cron.schedule('0 7 * * *', async () => {
         // Send reminders for feeders scheduled for tomorrow
         const feeders = await getFeedersScheduledForTomorrow();
         if (feeders.length > 0) {
-            await Promise.all([
-                ...feeders.map(feeder => sendEmail(feeder.feederName, feeder.scheduledDate)),
-                ...feeders.map(feeder => sendSMS(feeder.feederName, feeder.scheduledDate))
-            ]);
+            console.log(`📨 Sending reminders to ${feeders.length} feeders...`);
+
+            // Send emails and SMS concurrently
+            const emailResults = await Promise.allSettled(
+                feeders.map(feeder => sendEmail(feeder.feederName, feeder.scheduledDate))
+            );
+            const smsResults = await Promise.allSettled(
+                feeders.map(feeder => sendSMS(feeder.feederName, feeder.scheduledDate))
+            );
+
+            // Log results
+            emailResults.forEach((result, index) => {
+                if (result.status === 'rejected') {
+                    console.error(`❌ Failed to send email for ${feeders[index].feederName}:`, result.reason);
+                }
+            });
+            smsResults.forEach((result, index) => {
+                if (result.status === 'rejected') {
+                    console.error(`❌ Failed to send SMS for ${feeders[index].feederName}:`, result.reason);
+                }
+            });
+
+            console.log("✅ Reminders sent successfully.");
         } else {
             console.log("✅ No feeders scheduled for tomorrow.");
         }
@@ -362,6 +386,32 @@ app.get('/check-env', (req, res) => {
         ADMIN_PHONE_NUMBER: process.env.ADMIN_PHONE_NUMBER,
         TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER
     });
+});
+
+app.get('/cron-status', (req, res) => {
+    try {
+        const cronExpression = '0 7 * * *';
+        const interval = cronParser.parse(cronExpression);
+        const nextRun = interval.next().toDate();
+
+        // Convert to IST (Asia/Kolkata) using Intl.DateTimeFormat
+        const formatter = new Intl.DateTimeFormat('en-GB', { 
+            timeZone: 'Asia/Kolkata', 
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+        });
+
+        const nextRunIST = formatter.format(nextRun);
+
+        res.json({
+            nextRunUTC: nextRun.toISOString(),
+            nextRunIST: nextRunIST.replace(',', ''), // Remove comma for cleaner output
+            timezone: "Asia/Kolkata"
+        });
+    } catch (error) {
+        console.error("❌ Cron status error:", error);
+        res.status(500).json({ message: "Failed to calculate cron status", error: error.message });
+    }
 });
 
 // Add this route to server.js to check server time
