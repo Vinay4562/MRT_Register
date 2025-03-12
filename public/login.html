@@ -236,17 +236,37 @@
             }
         }
 
-        // Clear form fields on page load
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("username").value = "";
-            document.getElementById("password").value = "";
-        });
+    // Function to check session status
+    async function checkSession() {
+            try {
+                const response = await fetch("/api/check-auth", {
+                    credentials: "include" // Include cookies in the request
+                });
 
-        // Prevent back button caching and force reload
-        window.history.pushState(null, null, window.location.href);
-        window.addEventListener("popstate", function () {
-            window.location.reload(); // Force reload the page
-        });
+                // If the session is invalid, redirect to the login page
+                if (!response.ok) {
+                    window.location.href = "/login";
+                }
+            } catch (error) {
+                console.error("Session check failed:", error);
+                window.location.href = "/login"; // Redirect to login on error
+            }
+        }
+
+        // Check session status every 5 seconds
+        setInterval(checkSession, 5000);
+
+    // Clear form fields on page load
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+    });
+
+    // Prevent back button from showing cached pages
+    window.history.pushState(null, null, window.location.href);
+    window.addEventListener("popstate", function () {
+        window.location.reload(true); // Force reload from the server
+    });
     </script>
 </body>
 </html>

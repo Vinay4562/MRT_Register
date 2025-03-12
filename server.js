@@ -50,7 +50,8 @@ const isAuthenticated = (req, res, next) => {
     if (req.session.loggedIn) {
         return next();
     }
-    res.redirect('/login');
+    // Redirect to login with a cache-busting parameter
+    res.redirect(`/login?t=${Date.now()}`);
 };
 
 app.use(passport.initialize());
@@ -102,10 +103,21 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) return res.status(500).json({ message: 'Logout failed' });
-        res.clearCookie('mrt_session');
-        res.redirect('/login');
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("❌ Logout error:", err);
+            return res.status(500).json({ message: 'Logout failed' });
+        }
+
+        // Clear the session cookie
+        res.clearCookie('mrt_session', {
+            path: '/', // Ensure the cookie is cleared for all paths
+            httpOnly: true, // Match the cookie's original settings
+            secure: process.env.NODE_ENV === 'production' // Secure in production
+        });
+
+        // Redirect to login with a cache-busting query parameter
+        res.redirect(`/login?t=${Date.now()}`);
     });
 });
 
