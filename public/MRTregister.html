@@ -149,20 +149,24 @@
 
                     const data = await response.json();
                     dataTable.innerHTML = "";
-                    const today = moment().format("DD-MM-YYYY");
-                    const tomorrow = moment().add(1, 'days').format("DD-MM-YYYY");
+                    const today = moment().startOf('day'); // Use moment object for comparison
+                    const tomorrow = moment().add(1, 'days').startOf('day');
 
-                    // Regex to validate DD-MM-YYYY format
-                    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+                    const dateRegex = /^\d{2}-\d{2}-\d{4}$/; // DD-MM-YYYY validator
 
                     if (data.length > 0) {
                         data.forEach((feeder, index) => {
                             const row = document.createElement("tr");
                             row.dataset.id = feeder._id;
 
-                            // Ensure scheduledDate is valid before parsing
+                            // Validate and parse scheduledDate
                             const isValidDate = dateRegex.test(feeder.scheduledDate);
-                            const scheduledMoment = isValidDate ? moment(feeder.scheduledDate, "DD-MM-YYYY") : null;
+                            if (!isValidDate) {
+                                console.warn(`Invalid scheduledDate for feeder ${feeder.feederName}: ${feeder.scheduledDate}`);
+                            }
+
+                            // Use strict parsing with Moment.js
+                            const scheduledMoment = isValidDate ? moment(feeder.scheduledDate, "DD-MM-YYYY", true) : null;
 
                             row.innerHTML = `
                                 <td>${index + 1}</td>
@@ -175,10 +179,12 @@
                                 <td><button class="edit-button">Edit</button></td>
                                 <td><button class="delete-button">Delete</button></td>
                             `;
-                            if (isValidDate && feeder.scheduledDate === tomorrow && ["Pending", "Incomplete"].includes(feeder.status)) {
+
+                            // Compare dates using Moment objects
+                            if (isValidDate && scheduledMoment.isSame(tomorrow, 'day') && ["Pending", "Incomplete"].includes(feeder.status)) {
                                 row.classList.add("scheduled-tomorrow");
                             }
-                            if (isValidDate && feeder.status === "Incomplete" && scheduledMoment && scheduledMoment.isBefore(today)) {
+                            if (isValidDate && feeder.status === "Incomplete" && scheduledMoment.isBefore(today, 'day')) {
                                 row.classList.add("overdue-incomplete");
                             }
                             dataTable.appendChild(row);
