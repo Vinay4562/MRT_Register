@@ -5,62 +5,66 @@ body {
     padding: 0;
     background-color: #f4f4f4;
     text-align: center;
+    font-size: 16px; /* Base font size for scalability */
 }
 
 /* Header */
 .header {
     background: #0073e6;
     color: white;
-    padding: 10px 0;
+    padding: 1rem 0; /* Use rem for responsive padding */
     display: flex;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 1rem;
 }
 
 .header h1 {
-    font-size: 24px;
+    font-size: clamp(1.2rem, 5vw, 1.5rem); /* Responsive font size */
 }
 
 .logo {
-    width: 130px;
-    height: 100px;
-    background-color: white; /* Set background color to white */
-    padding: 10px; /* Optional: Add some padding around the logo */
-    border-radius: 10px; /* Optional: Add rounded corners */
+    width: clamp(80px, 20vw, 130px); /* Scales between 80px and 130px */
+    height: auto; /* Maintain aspect ratio */
+    background-color: white;
+    padding: 0.5rem;
+    border-radius: 10px;
 }
 
 /* Navbar */
 .navbar {
     background: #005bb5;
-    padding: 10px;
-    text-align: right;
+    padding: 0.75rem;
+    text-align: center; /* Center buttons on mobile */
 }
 
 .navbar button {
     background: #ff4d4d;
     color: white;
     border: none;
-    padding: 8px 16px;
-    font-size: 16px;
+    padding: 0.75rem 1.5rem; /* Larger padding for touch */
+    font-size: 1rem;
     cursor: pointer;
     border-radius: 4px;
+    margin: 0.25rem; /* Add spacing between stacked buttons */
 }
 
+/* Highlight Classes */
 .overdue-incomplete {
-    background-color: #ffcccc; /* Light red for overdue Incomplete */
+    background-color: #ffcccc;
 }
 
 .scheduled-tomorrow {
-    background-color: #ffeb3b; /* Yellow for tomorrow’s schedule */
+    background-color: #ffeb3b;
 }
 
 /* Table */
 .table-container {
-    width: 90%;
-    margin: 20px auto;
+    width: 95%; /* Slightly wider on mobile */
+    margin: 1rem auto;
     background: white;
-    padding: 20px;
+    padding: 1rem;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
@@ -68,13 +72,14 @@ body {
 #data-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 0.5rem;
 }
 
 #data-table th, #data-table td {
-    padding: 12px;
+    padding: 0.75rem;
     border: 1px solid #ddd;
     text-align: left;
+    font-size: 0.9rem; /* Slightly smaller on mobile */
 }
 
 #data-table th {
@@ -87,16 +92,16 @@ body {
     background: #0073e6;
     color: white;
     border: none;
-    padding: 8px 12px;
+    padding: 0.75rem 1.25rem;
     cursor: pointer;
     border-radius: 4px;
+    font-size: 1rem;
 }
 
 .add-button {
-    margin: 20px auto;
+    margin: 1rem auto;
     display: block;
-    font-size: 16px;
-    padding: 10px 20px;
+    padding: 0.75rem 1.5rem;
 }
 
 .edit-button {
@@ -107,10 +112,11 @@ body {
     background: #ff4d4d;
 }
 
+/* Status Indicators */
 .pending-status {
-    background-color: #FFC107 !important; /* Brighter yellow */
+    background-color: #FFC107 !important;
     color: white !important;
-    padding: 6px 10px;
+    padding: 0.5rem 0.75rem;
     border-radius: 4px;
     text-align: center;
     font-weight: bold;
@@ -118,9 +124,9 @@ body {
 }
 
 .incomplete-status {
-    background-color: #DC3545 !important; /* Bootstrap Red */
+    background-color: #DC3545 !important;
     color: white !important;
-    padding: 6px 10px;
+    padding: 0.5rem 0.75rem;
     border-radius: 4px;
     text-align: center;
     font-weight: bold;
@@ -128,35 +134,37 @@ body {
 }
 
 .completed-status {
-    background-color: #28A745 !important; /* Green */
+    background-color: #28A745 !important;
     color: white !important;
-    padding: 6px 10px;
+    padding: 0.5rem 0.75rem;
     border-radius: 4px;
     text-align: center;
     font-weight: bold;
     display: inline-block;
 }
 
+/* Popup */
 .popup {
     display: none;
-    padding: 20px;
+    padding: 1rem;
     position: fixed;
-    top: 20px;
+    top: 1rem;
     left: 50%;
     transform: translateX(-50%);
     background-color: rgba(0, 0, 0, 0.8);
     color: white;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 1rem;
     z-index: 1000;
+    max-width: 90%; /* Prevent overflow on small screens */
 }
 
 .popup.success {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
 }
 
 .popup.error {
-    background-color: #f44336; /* Red */
+    background-color: #f44336;
 }
 
 /* Modal */
@@ -174,16 +182,17 @@ body {
 
 .form-container {
     background: white;
-    padding: 20px;
+    padding: 1.5rem;
     border-radius: 8px;
-    width: 400px;
+    width: 90%; /* Responsive width */
+    max-width: 400px; /* Cap width for larger screens */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .close-button {
     background: none;
     border: none;
-    font-size: 24px;
+    font-size: 1.5rem;
     cursor: pointer;
     float: right;
 }
@@ -191,27 +200,69 @@ body {
 /* Form */
 label {
     display: block;
-    margin-top: 10px;
+    margin-top: 0.75rem;
     font-weight: bold;
 }
 
 input, select {
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
+    padding: 0.5rem;
+    margin-top: 0.3rem;
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box; /* Ensure padding doesn’t increase width */
 }
 
-/* Status Colors */
-.pending-status {
-    color: orange;
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column; /* Stack header items */
+        padding: 0.5rem;
+    }
+
+    .navbar {
+        text-align: center;
+    }
+
+    #data-table th, #data-table td {
+        font-size: 0.85rem; /* Smaller text */
+        padding: 0.5rem;
+    }
+
+    .table-container {
+        width: 98%;
+        overflow-x: auto; /* Allow horizontal scrolling for tables */
+    }
+
+    .form-container {
+        width: 95%;
+    }
 }
 
-.incomplete-status {
-    color: red;
-}
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.1rem;
+    }
 
-.completed-status {
-    color: green;
+    .logo {
+        width: 60px; /* Smaller logo */
+    }
+
+    .navbar button, .add-button, .save-button, .edit-button, .delete-button {
+        padding: 0.5rem 1rem; /* Smaller buttons */
+        font-size: 0.9rem;
+    }
+
+    #data-table {
+        font-size: 0.8rem;
+    }
+
+    #data-table th, #data-table td {
+        padding: 0.4rem;
+    }
+
+    .popup {
+        font-size: 0.9rem;
+        padding: 0.75rem;
+    }
 }
