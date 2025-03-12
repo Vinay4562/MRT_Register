@@ -146,16 +146,24 @@
                         credentials: "include",
                     });
                     if (!response.ok) throw new Error("Network response was not ok");
-    
+
                     const data = await response.json();
                     dataTable.innerHTML = "";
                     const today = moment().format("DD-MM-YYYY");
                     const tomorrow = moment().add(1, 'days').format("DD-MM-YYYY");
-    
+
+                    // Regex to validate DD-MM-YYYY format
+                    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+
                     if (data.length > 0) {
                         data.forEach((feeder, index) => {
                             const row = document.createElement("tr");
                             row.dataset.id = feeder._id;
+
+                            // Ensure scheduledDate is valid before parsing
+                            const isValidDate = dateRegex.test(feeder.scheduledDate);
+                            const scheduledMoment = isValidDate ? moment(feeder.scheduledDate, "DD-MM-YYYY") : null;
+
                             row.innerHTML = `
                                 <td>${index + 1}</td>
                                 <td>${feeder.feederName}</td>
@@ -167,10 +175,10 @@
                                 <td><button class="edit-button">Edit</button></td>
                                 <td><button class="delete-button">Delete</button></td>
                             `;
-                            if (feeder.scheduledDate === tomorrow && ["Pending", "Incomplete"].includes(feeder.status)) {
+                            if (isValidDate && feeder.scheduledDate === tomorrow && ["Pending", "Incomplete"].includes(feeder.status)) {
                                 row.classList.add("scheduled-tomorrow");
                             }
-                            if (feeder.status === "Incomplete" && moment(feeder.scheduledDate, "DD-MM-YYYY").isBefore(today)) {
+                            if (isValidDate && feeder.status === "Incomplete" && scheduledMoment && scheduledMoment.isBefore(today)) {
                                 row.classList.add("overdue-incomplete");
                             }
                             dataTable.appendChild(row);
