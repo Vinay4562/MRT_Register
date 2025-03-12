@@ -18,35 +18,41 @@ const app = express();
 const port = process.env.PORT || 3500;
 const mongoUri = process.env.MONGO_URI;
 
-// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("✅ Connected to MongoDB"))
     .catch(err => console.error("❌ MongoDB Connection Error:", err));
 
-// Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors({
     origin: ['http://400kvssshankarpally.free.nf', 'https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app'],
     credentials: true
 }));
-app.use(express.static(path.join(__dirname, 'public')));
 
-// Session Middleware
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET || 'default_secret',
-        resave: false,
-        saveUninitialized: true,
-        store: MongoStore.create({ mongoUrl: mongoUri }),
-        cookie: {
-            maxAge: 1000 * 60 * 60 * 24, // 1-day expiration
-            name: 'mrt_session' // Unique session cookie name
-        }
-    })
-);
+// Serve static files, but exclude MRTregister.html
+app.use(express.static(path.join(__dirname, 'public'), {
+    redirect: false,
+    index: false // Prevent serving index.html by default
+}));
 
-// Passport Configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'default_secret',
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({ mongoUrl: mongoUri }),
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24, // 1-day expiration
+        name: 'mrt_session'
+    }
+}));
+
+const isAuthenticated = (req, res, next) => {
+    if (req.session.loggedIn) {
+        return next();
+    }
+    res.redirect('/login');
+};
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -66,7 +72,6 @@ passport.use(new LocalStrategy((username, password, done) => {
 passport.serializeUser((user, done) => done(null, user.username));
 passport.deserializeUser((username, done) => done(null, { username }));
 
-// Authentication Routes
 app.get('/api/check-auth', (req, res) => {
     res.status(req.session.loggedIn ? 200 : 401).json({ authenticated: !!req.session.loggedIn });
 });
@@ -88,41 +93,41 @@ app.post('/login', (req, res) => {
 app.post('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) return res.status(500).json({ message: 'Logout failed' });
-        res.clearCookie('connect.sid');
-        res.status(200).json({ message: 'Logged out successfully' });
+        res.clearCookie('mrt_session');
+        res.redirect('/login');
     });
 });
 
-app.get('/MRTregister.html', (req, res) => {
-    req.session.loggedIn ? res.sendFile(path.join(__dirname, 'public', 'MRTregister.html')) : res.redirect('/login');
+app.get('/MRTregister.html', isAuthenticated, (req, res) => {
+    res.set({
+        'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+    });
+    res.sendFile(path.join(__dirname, 'public', 'MRTregister.html'));
 });
 
-// Define Feeder Schema & Model
 const feederSchema = new mongoose.Schema({
     feederName: { type: String, required: true },
     lastTestedDate: { type: String, required: true },
     scheduledDate: { type: String, required: true },
     status: { type: String, required: true },
     remarks: { type: String },
-    lastNotified: { type: String } // Add this field
+    lastNotified: { type: String }
 });
 
 const Feeder = mongoose.model('Feeder', feederSchema);
 
-// Middleware to validate date format (DD-MM-YYYY)
 const validateDateFormat = (req, res, next) => {
-    const dateRegex = /^\d{2}-\d{2}-\d{4}$/; // Regex for DD-MM-YYYY format
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
     const { lastTestedDate, scheduledDate } = req.body;
-
     if (!dateRegex.test(lastTestedDate) || !dateRegex.test(scheduledDate)) {
         return res.status(400).json({ message: 'Invalid date format. Use DD-MM-YYYY.' });
     }
-
-    next(); // Proceed to the next middleware/route handler
+    next();
 };
 
-// CRUD Routes for Feeders
-app.get('/feeders', async (req, res) => {
+app.get('/feeders', isAuthenticated, async (req, res) => {
     try {
         const feeders = await Feeder.find();
         res.json(feeders);
@@ -131,7 +136,7 @@ app.get('/feeders', async (req, res) => {
     }
 });
 
-app.post('/feeders', validateDateFormat, async (req, res) => {
+app.post('/feeders', isAuthenticated, validateDateFormat, async (req, res) => {
     try {
         const feeder = new Feeder(req.body);
         await feeder.save();
@@ -141,7 +146,7 @@ app.post('/feeders', validateDateFormat, async (req, res) => {
     }
 });
 
-app.put('/feeders/:id', validateDateFormat, async (req, res) => {
+app.put('/feeders/:id', isAuthenticated, validateDateFormat, async (req, res) => {
     try {
         const updatedFeeder = await Feeder.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         updatedFeeder ? res.json(updatedFeeder) : res.status(404).json({ message: 'Feeder not found' });
@@ -150,12 +155,46 @@ app.put('/feeders/:id', validateDateFormat, async (req, res) => {
     }
 });
 
-app.delete('/feeders/:id', async (req, res) => {
+app.delete('/feeders/:id', isAuthenticated, async (req, res) => {
     try {
         const feeder = await Feeder.findByIdAndDelete(req.params.id);
         feeder ? res.sendStatus(204) : res.status(404).json({ message: 'Feeder not found' });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+app.get('/test-sms', isAuthenticated, async (req, res) => {
+    const feeder = await Feeder.findOne();
+    if (!feeder) return res.status(404).send("No scheduled feeders found.");
+    try {
+        await sendSMS(feeder.feederName, feeder.scheduledDate);
+        res.send("✅ SMS test triggered successfully!");
+    } catch (error) {
+        console.error("SMS Error:", error);
+        res.status(500).send("❌ Failed to send SMS: " + error.message);
+    }
+});
+
+app.get('/test-email', isAuthenticated, async (req, res) => {
+    const feeder = await Feeder.findOne();
+    if (!feeder) return res.status(404).send("No scheduled feeders found.");
+    try {
+        await sendEmail(feeder.feederName, feeder.scheduledDate);
+        res.send("✅ Email test triggered successfully!");
+    } catch (error) {
+        console.error("Email Error:", error);
+        res.status(500).send("❌ Failed to send Email: " + error.message);
+    }
+});
+
+app.get('/test-overdue', isAuthenticated, async (req, res) => {
+    try {
+        await updateOverdueFeeders();
+        res.send("✅ Overdue feeder update triggered successfully!");
+    } catch (error) {
+        console.error("Overdue Feeder Error:", error);
+        res.status(500).send("❌ Failed to update overdue feeders: " + error.message);
     }
 });
 
@@ -345,40 +384,6 @@ cron.schedule('0 7 * * *', async () => {
 }, { timezone: "Asia/Kolkata" });
 
 console.log("🚀 Reminder Schedulers are Running...");
-
-// Manual Test Route
-app.get('/test-sms', async (req, res) => {
-    const feeder = await Feeder.findOne();
-    if (!feeder) {
-        return res.status(404).send("No scheduled feeders found.");
-    }
-
-    try {
-        await sendSMS(feeder.feederName, feeder.scheduledDate);
-        res.send("✅ SMS test triggered successfully!");
-    } catch (error) {
-        console.error("SMS Error:", error);
-        res.status(500).send("❌ Failed to send SMS: " + error.message);
-    }
-});
-
-// Manual Test Route for Email (Add this below /test-sms)
-app.get('/test-email', async (req, res) => {
-    const feeder = await Feeder.findOne();
-    if (!feeder) return res.status(404).send("No scheduled feeders found.");
-    await sendEmail(feeder.feederName, feeder.scheduledDate);
-    res.send("✅ Email test triggered successfully!");
-});
-
-app.get('/test-overdue', async (req, res) => {
-    try {
-        await updateOverdueFeeders();
-        res.send("✅ Overdue feeder update triggered successfully!");
-    } catch (error) {
-        console.error("Overdue Feeder Error:", error);
-        res.status(500).send("❌ Failed to update overdue feeders: " + error.message);
-    }
-});
 
 app.get('/check-env', (req, res) => {
     console.log("Environment Variables:", process.env);
