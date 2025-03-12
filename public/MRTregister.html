@@ -326,24 +326,25 @@
                 checkAuthAndPreventBack();
             });
     
-            document.getElementById("logoutButton").addEventListener("click", function () {
-                if (confirm("Are you sure you want to logout?")) {
-                    fetch("/logout", {
+            document.getElementById("logoutButton").addEventListener("click", async function () {
+                console.log("Logout button clicked"); // Debug log
+                try {
+                    const response = await fetch("/logout", {
                         method: "POST",
                         credentials: "include"
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            // Clear form data and history state
-                            localStorage.clear(); // Optional: clear any local storage if used
-                            sessionStorage.clear(); // Optional: clear session storage
-                            window.history.pushState(null, null, "/login.html");
-                            window.location.replace("/login.html"); // Replace to avoid back navigation
-                        })
-                        .catch(error => {
-                            console.error("Error during logout:", error);
-                            showPopup("Error logging out", true);
-                        });
+                    });
+
+                    console.log("Logout response:", response); // Debug log
+                    if (response.ok) {
+                        console.log("Logout successful"); // Debug log
+                        window.location.href = "/login";
+                    } else {
+                        console.error("Logout failed:", response.statusText); // Debug log
+                        alert("Logout failed. Please try again.");
+                    }
+                } catch (error) {
+                    console.error("Logout error:", error); // Debug log
+                    alert("An error occurred during logout. Please try again.");
                 }
             });
         });

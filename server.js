@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors({
     origin: ['http://400kvssshankarpally.free.nf', 'https://mrt-register-git-main-vinay-kumars-projects-f1559f4a.vercel.app'],
-    credentials: true
+    credentials: true // Allow credentials (cookies) to be sent
 }));
 
 // Serve static files, but exclude MRTregister.html
@@ -103,6 +103,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
+    // Destroy the session
     req.session.destroy((err) => {
         if (err) {
             console.error("❌ Logout error:", err);
@@ -116,8 +117,8 @@ app.post('/logout', (req, res) => {
             secure: process.env.NODE_ENV === 'production' // Secure in production
         });
 
-        // Redirect to login with a cache-busting query parameter
-        res.redirect(`/login?t=${Date.now()}`);
+        // Send a success response
+        res.status(200).json({ message: 'Logout successful' });
     });
 });
 
