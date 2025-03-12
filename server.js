@@ -38,11 +38,14 @@ app.use(express.static(path.join(__dirname, 'public'), {
 app.use(session({
     secret: process.env.SESSION_SECRET || 'default_secret',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // Set to false to avoid saving uninitialized sessions
     store: MongoStore.create({ mongoUrl: mongoUri }),
     cookie: {
         maxAge: 1000 * 60 * 60 * 24, // 1-day expiration
-        name: 'mrt_session'
+        name: 'mrt_session',
+        httpOnly: true, // Prevent client-side JS from accessing the cookie
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        sameSite: 'strict' // Prevent CSRF attacks
     }
 }));
 
