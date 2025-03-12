@@ -77,7 +77,15 @@ app.get('/api/check-auth', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    req.session.loggedIn ? res.redirect('/MRTregister.html') : res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    if (req.session.loggedIn) {
+        return res.redirect('/MRTregister.html');
+    }
+    res.set({
+        'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+    });
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 app.post('/login', (req, res) => {
