@@ -337,6 +337,7 @@
                     console.log("Logout response:", response); // Debug log
                     if (response.ok) {
                         console.log("Logout successful"); // Debug log
+                        alert("Logout successful.");
                         window.location.href = "/login";
                     } else {
                         console.error("Logout failed:", response.statusText); // Debug log

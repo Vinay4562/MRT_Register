@@ -236,26 +236,6 @@
             }
         }
 
-    // Function to check session status
-    async function checkSession() {
-            try {
-                const response = await fetch("/api/check-auth", {
-                    credentials: "include" // Include cookies in the request
-                });
-
-                // If the session is invalid, redirect to the login page
-                if (!response.ok) {
-                    window.location.href = "/login";
-                }
-            } catch (error) {
-                console.error("Session check failed:", error);
-                window.location.href = "/login"; // Redirect to login on error
-            }
-        }
-
-        // Check session status every 5 seconds
-        setInterval(checkSession, 15000);
-
     // Clear form fields on page load
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("username").value = "";
