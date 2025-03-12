@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Login Page</title>
     <style>
         body {
@@ -195,7 +198,7 @@
     <div class="navbar">
         <a href='https://400kvssshankarpally.free.nf/'>Home</a>
         <a href="#">LC Procedures</a>
-        <a href='https://maxregister-git-main-vinay-kumars-projects-f1559f4a.vercel.app/Displaydata_original.html'>Max-Min Data</a>
+        <a href='https://maxregister-git-main-vinay-kumars-projects-f1559f4a.vercel.app/newdata.html'>Max-Min Data</a>
     </div>
 
     <div class="login-container">
@@ -208,10 +211,14 @@
             <div class="input-group">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
-                <span class="toggle-password" onclick="togglePassword()">Show</span>
+                <span class="toggle-password" onclick="togglePassword()">👁️</span>
             </div>
-            <button type="submit">Login</button>
+            <button type="submit" id="loginButton">
+                <span id="buttonText">Login</span>
+                <span id="loadingSpinner" style="display: none;">Loading...</span>
+            </button>
             <p class="login-message" id="loginMessage">Login Successful!</p>
+            <p class="login-error" id="loginError" style="color: red; display: none;">Invalid username or password.</p>
         </form>
     </div>
 
@@ -222,19 +229,48 @@
             var toggleText = document.querySelector(".toggle-password");
             if (passwordField.type === "password") {
                 passwordField.type = "text";
-                toggleText.textContent = "Hide";
+                toggleText.textContent = "👁️";
             } else {
                 passwordField.type = "password";
-                toggleText.textContent = "Show";
+                toggleText.textContent = "👁️";
             }
         }
 
-        // Prevent back button caching
+        // Clear form fields on page load
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+        });
+
+        // Prevent back button caching and force reload
         window.history.pushState(null, null, window.location.href);
-            window.addEventListener("popstate", function () {
-                window.history.pushState(null, null, window.location.href);
+        window.addEventListener("popstate", function () {
+            window.location.reload(); // Force reload the page
+        });
+
+        // Handle form submission
+        document.getElementById("loginForm").addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent default form submission
+            document.getElementById("buttonText").style.display = "none";
+            document.getElementById("loadingSpinner").style.display = "inline";
+
+            // Simulate a login request (replace with actual fetch/axios call)
+            setTimeout(function () {
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+
+                if (username === "admin" && password === "password") {
+                    document.getElementById("loginMessage").style.display = "block";
+                    document.getElementById("loginError").style.display = "none";
+                } else {
+                    document.getElementById("loginError").style.display = "block";
+                    document.getElementById("loginMessage").style.display = "none";
+                }
+
+                document.getElementById("buttonText").style.display = "inline";
+                document.getElementById("loadingSpinner").style.display = "none";
+            }, 2000); // Simulate a 2-second delay
         });
     </script>
-
 </body>
 </html>

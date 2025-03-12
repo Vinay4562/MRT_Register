@@ -80,11 +80,14 @@ app.get('/login', (req, res) => {
     if (req.session.loggedIn) {
         return res.redirect('/MRTregister.html');
     }
+
+    // Add headers to prevent caching
     res.set({
         'Cache-Control': 'no-store, no-cache, must-revalidate, private',
         'Pragma': 'no-cache',
         'Expires': '0'
     });
+
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
