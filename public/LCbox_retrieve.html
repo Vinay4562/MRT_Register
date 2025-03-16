@@ -14,8 +14,10 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <img src="logo_new.png" alt="Logo" class="logo" width="130" height="100">
-        <h1>𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃</h1>
+        <div class="header-left">
+            <img src="logo_new.png" alt="Logo" class="logo" width="130" height="100">
+            <h1 id="header-title">𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃</h1>
+        </div>
         <button class="hamburger" onclick="openNav()">☰</button>
     </div>
 
@@ -28,7 +30,7 @@
 
     <!-- Hamburger Overlay -->
     <div id="myNav" class="overlay">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
         <div class="overlay-content">
             <a href="https://400kvssshankarpally.free.nf/">Home</a>
             <a href="https://400kvssshankarpally.free.nf/underConstruction.html">LC Procedures</a>
@@ -45,7 +47,7 @@
 
     <!-- Download Button -->
     <div class="download-container">
-        <button onclick="downloadPDF()" class="download-btn">
+        <button onclick="updateHeaderTitle(); downloadPDF();" class="download-btn">
             <i class="fa fa-download"></i> Download PDF
         </button>
     </div>
@@ -88,6 +90,19 @@
     </footer>
 
     <script>
+        // Function to update header title based on screen size
+        function updateHeaderTitle() {
+            const headerTitle = document.getElementById("header-title");
+            if (window.innerWidth <= 999) {
+                headerTitle.textContent = "TG TRANSCO";
+            } else {
+                headerTitle.textContent = "𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃";
+            }
+        }
+
+        // Initial call and event listener for resizing
+        window.addEventListener("load", updateHeaderTitle);
+        window.addEventListener("resize", updateHeaderTitle);
 
         // Hamburger Menu Functions
         function openNav() {
@@ -99,7 +114,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            fetchData(); // Fetch data when the page loads
+            fetchData();
         });
 
         let allData = [];
@@ -171,7 +186,7 @@
             cells.forEach((cellData, cellIndex) => {
                 const cell = newRow.insertCell(cellIndex);
                 cell.textContent = cellData;
-                cell.setAttribute('data-label', document.querySelector('thead th:nth-child(' + (cellIndex + 1) + ')').textContent); // For mobile
+                cell.setAttribute('data-label', document.querySelector('thead th:nth-child(' + (cellIndex + 1) + ')').textContent);
                 if (cellIndex === 4) {
                     cell.className = `status-cell ${data.status.toLowerCase()}-status`;
                 }
@@ -235,18 +250,19 @@
             const img = new Image();
             img.src = 'logo_new.png';
             img.onload = function () {
-                doc.addImage(img, 'PNG', 80, 5, 50, 30);
+                doc.addImage(img, 'PNG', 10, 5, 50, 30); // Adjusted position for left alignment
                 generatePDF(doc);
             };
         }
 
         function generatePDF(doc) {
+            const title = window.innerWidth <= 999 ? "TG TRANSCO" : "𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃";
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text("TG TRANSCO", 80, 45);
+            doc.text(title, 65, 20); // Adjusted position for left-aligned logo
             doc.setFontSize(12);
             doc.setFont("helvetica", "normal");
-            doc.text("MRT Testing Details", 85, 55);
+            doc.text("MRT Testing Details", 65, 30);
             let tableBody = document.getElementById("displayTableBody").rows;
             if (tableBody.length === 0) {
                 alert("No data available to download!");
@@ -265,7 +281,7 @@
             doc.autoTable({
                 head: [headers],
                 body: data,
-                startY: 65,
+                startY: 40,
                 styles: { fontSize: 10 },
                 headStyles: { fillColor: [0, 112, 192], textColor: 255 },
             });

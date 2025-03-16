@@ -13,13 +13,22 @@ body {
     background: #004aad;
     color: white;
     padding: 15px;
-    text-align: center;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    gap: 20px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     animation: slideDown 1s ease-in-out;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 24px; /* Default size for desktop */
 }
 
 /* Logo styling */
@@ -35,44 +44,14 @@ body {
     transform: scale(1.1);
 }
 
-/* Navigation Bar */
-.navbar {
-    background: #007bff;
-    padding: 10px 0;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    animation: fadeIn 1.5s ease-in-out;
-}
-
-.navbar a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 20px;
-    font-size: 18px;
-    transition: all 0.3s;
-}
-
-.navbar a:hover {
-    background: white;
-    color: #007bff;
-    border-radius: 5px;
-}
-
 /* Hamburger Menu */
 .hamburger {
-    display: none; /* Hidden by default on larger screens */
+    display: none; /* Hidden by default on desktop */
     font-size: 24px;
     background: none;
     border: none;
     color: white;
     cursor: pointer;
-    position: absolute;
-    right: 15px;
-    top: 15px;
 }
 
 .overlay {
@@ -119,10 +98,37 @@ body {
     font-size: 30px;
 }
 
+/* Navigation Bar */
+.navbar {
+    background: #007bff;
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    transition: all 0.3s;
+}
+
+.navbar a:hover {
+    background: white;
+    color: #007bff;
+    border-radius: 5px;
+}
+
 /* Table Styling */
 .table-container {
-    max-height: 400px; /* Limit table height for vertical scrolling */
-    overflow-y: auto; /* Enable vertical scrollbar */
+    max-height: 400px;
+    overflow-y: auto;
     width: 90%;
     margin: 20px auto;
     margin-bottom: 60px;
@@ -299,23 +305,20 @@ tr:nth-child(even) {
 /* 999px Breakpoint */
 @media (max-width: 999px) {
     .header h1 {
-        font-size: 20px;
-        content: "TG TRANSCO";
+        font-size: 20px; /* Adjusted for "TG TRANSCO" */
     }
-    .header {
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 10px;
+    .header-left {
+        gap: 10px;
     }
     .logo {
         width: 100px;
         height: 80px;
     }
     .navbar {
-        display: none; /* Hide regular navbar */
+        display: none;
     }
     .hamburger {
-        display: block; /* Show hamburger menu */
+        display: block;
     }
     .table-container {
         width: 95%;
@@ -330,12 +333,11 @@ tr:nth-child(even) {
 
 /* 768px Breakpoint */
 @media (max-width: 768px) {
-    .header h1 {
-        font-size: 18px;
-        content: "TG TRANSCO";
-    }
     .header {
         padding: 8px;
+    }
+    .header h1 {
+        font-size: 18px; /* Adjusted for "TG TRANSCO" */
     }
     .logo {
         width: 80px;
@@ -343,10 +345,10 @@ tr:nth-child(even) {
     }
     .table-container {
         width: 100%;
-        max-height: 350px; /* Adjust table height */
+        max-height: 350px;
     }
     thead {
-        display: none; /* Hide headers */
+        display: none;
     }
     tr {
         display: block;
@@ -383,8 +385,7 @@ tr:nth-child(even) {
 /* 698px Breakpoint */
 @media (max-width: 698px) {
     .header h1 {
-        font-size: 16px;
-        content: "TG TRANSCO";
+        font-size: 16px; /* Adjusted for "TG TRANSCO" */
     }
     .logo {
         width: 70px;
@@ -408,12 +409,11 @@ tr:nth-child(even) {
 
 /* 480px Breakpoint */
 @media (max-width: 480px) {
-    .header h1 {
-        font-size: 14px;
-        content: "TG TRANSCO";
-    }
     .header {
         padding: 5px;
+    }
+    .header h1 {
+        font-size: 14px; /* Adjusted for "TG TRANSCO" */
     }
     .logo {
         width: 60px;
