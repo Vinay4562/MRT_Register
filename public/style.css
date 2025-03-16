@@ -26,9 +26,9 @@ body {
 .logo {
     width: 130px;
     height: 100px;
-    background-color: white; /* Set background color to white */
-    padding: 10px; /* Optional: Add some padding around the logo */
-    border-radius: 10px; /* Optional: Add rounded corners */
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
 }
 
 .logo:hover {
@@ -62,20 +62,79 @@ body {
     border-radius: 5px;
 }
 
+/* Hamburger Menu */
+.hamburger {
+    display: none; /* Hidden by default on larger screens */
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+}
+
+.overlay {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 2000;
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 74, 173, 0.95);
+    overflow-x: hidden;
+    transition: 0.5s;
+}
+
+.overlay-content {
+    position: relative;
+    top: 25%;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.overlay a {
+    padding: 10px;
+    text-decoration: none;
+    font-size: 20px;
+    color: white;
+    display: block;
+    transition: 0.3s;
+}
+
+.overlay a:hover {
+    color: #007bff;
+    background: white;
+    border-radius: 5px;
+}
+
+.overlay .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 30px;
+}
+
 /* Table Styling */
-table {
+.table-container {
+    max-height: 400px; /* Limit table height for vertical scrolling */
+    overflow-y: auto; /* Enable vertical scrollbar */
     width: 90%;
     margin: 20px auto;
     margin-bottom: 60px;
+}
+
+table {
+    width: 100%;
     border-collapse: collapse;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     background: white;
     border-radius: 10px;
     animation: fadeInUp 1.2s ease-in-out;
-}
-
-.table-container {
-    padding-bottom: 60px; /* Adjust this value as needed */
 }
 
 thead {
@@ -94,7 +153,7 @@ tr:nth-child(even) {
 
 .download-container {
     display: flex;
-    justify-content: flex-end;  /* Moves button to right */
+    justify-content: flex-end;
     margin-bottom: 10px;
     margin-right: 10px;
 }
@@ -116,13 +175,11 @@ tr:nth-child(even) {
     overflow: hidden;
 }
 
-/* Hover Effect */
 .download-btn:hover {
     transform: scale(1.05);
     box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.7);
 }
 
-/* Pulsating Animation */
 @keyframes pulse {
     0% { box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.8); }
     50% { box-shadow: 0px 0px 20px rgba(255, 0, 0, 1); }
@@ -213,7 +270,7 @@ tr:nth-child(even) {
     left: 0;
     width: 100%;
     text-align: center;
-    z-index: 1000; /* Ensures the footer stays above other elements */
+    z-index: 1000;
 }
 
 /* Animations */
@@ -238,49 +295,59 @@ tr:nth-child(even) {
 }
 
 /* Mobile Styles */
-@media (max-width: 768px) {
-    body {
-        font-size: 16px;
-        padding: 0;
-    }
 
-    /* Header */
+/* 999px Breakpoint */
+@media (max-width: 999px) {
+    .header h1 {
+        font-size: 20px;
+        content: "TG TRANSCO";
+    }
     .header {
-        flex-direction: column;
-        gap: 10px;
+        flex-direction: row;
+        justify-content: space-between;
         padding: 10px;
-        text-align: center;
     }
-
     .logo {
         width: 100px;
         height: 80px;
     }
-
-    /* Navbar */
     .navbar {
-        flex-direction: column;
-        padding: 5px 0;
-        gap: 5px;
+        display: none; /* Hide regular navbar */
     }
-
-    .navbar a {
-        font-size: 16px;
-        padding: 8px 12px;
+    .hamburger {
+        display: block; /* Show hamburger menu */
     }
-
-    /* Table */
+    .table-container {
+        width: 95%;
+    }
     table {
-        width: 100%;
         font-size: 14px;
-        overflow-x: auto;
-        display: block;
     }
+    .search-box {
+        width: 80%;
+    }
+}
 
+/* 768px Breakpoint */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 18px;
+        content: "TG TRANSCO";
+    }
+    .header {
+        padding: 8px;
+    }
+    .logo {
+        width: 80px;
+        height: 60px;
+    }
+    .table-container {
+        width: 100%;
+        max-height: 350px; /* Adjust table height */
+    }
     thead {
-        display: none; /* Hide table headers on small screens */
+        display: none; /* Hide headers */
     }
-
     tr {
         display: block;
         margin-bottom: 10px;
@@ -288,45 +355,92 @@ tr:nth-child(even) {
         border-radius: 10px;
         padding: 10px;
     }
-
     td {
         display: block;
         text-align: left;
         padding: 8px;
-        font-size: 14px;
     }
-
     td::before {
+        content: attr(data-label);
         font-weight: bold;
         color: #004aad;
+        display: block;
+        margin-bottom: 5px;
     }
-
-    /* Search Box */
     .search-box {
         width: 90%;
     }
+    .filter-buttons {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    .filter-buttons button {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+}
 
+/* 698px Breakpoint */
+@media (max-width: 698px) {
+    .header h1 {
+        font-size: 16px;
+        content: "TG TRANSCO";
+    }
+    .logo {
+        width: 70px;
+        height: 50px;
+    }
+    .table-container {
+        max-height: 300px;
+    }
+    td {
+        font-size: 12px;
+    }
     .search-input {
         font-size: 14px;
         padding: 8px;
     }
-
-    /* Buttons */
-    .filter-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 5px;
+    .download-btn {
+        font-size: 14px;
+        padding: 8px 16px;
     }
+}
 
+/* 480px Breakpoint */
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 14px;
+        content: "TG TRANSCO";
+    }
+    .header {
+        padding: 5px;
+    }
+    .logo {
+        width: 60px;
+        height: 40px;
+    }
+    .table-container {
+        max-height: 250px;
+    }
+    td {
+        font-size: 11px;
+    }
+    .search-box {
+        width: 95%;
+    }
+    .search-input {
+        font-size: 12px;
+        padding: 6px;
+    }
     .filter-buttons button {
-        font-size: 14px;
-        padding: 8px 10px;
+        font-size: 10px;
+        padding: 6px 8px;
     }
-
-    /* Footer */
+    .download-btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
     .footer {
-        font-size: 14px;
-        padding: 8px 0;
+        font-size: 12px;
     }
 }
