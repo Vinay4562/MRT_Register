@@ -249,7 +249,13 @@ tr:nth-child(even) {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    position: fixed; /* Ensures it stays in the viewport, not affected by scroll */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    background: rgba(255, 255, 255, 0.8); /* Optional: semi-transparent background */
+    z-index: 3000; /* Ensures it appears above all other content */
 }
 
 .loader {
@@ -259,6 +265,13 @@ tr:nth-child(even) {
     width: 40px;
     height: 40px;
     animation: spin 1s linear infinite;
+    margin: auto; /* Ensures the loader itself is centered within the container */
+}
+
+/* Animation for spinning */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* Status Colors */
