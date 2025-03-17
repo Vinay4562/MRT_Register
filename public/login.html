@@ -30,7 +30,6 @@
         .header {
             width: 100%;
             padding: 20px;
-            text-align: center;
             background-color: rgba(255, 255, 255, 0.2);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             color: #fff;
@@ -41,32 +40,43 @@
             top: 0;
             left: 0;
             z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .logo {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             vertical-align: middle;
-            margin-right: 15px;
             background-color: #fff;
         }
 
         .header h1 {
-            display: inline-block;
             font-size: 2.3rem;
             text-decoration: underline;
+            margin: 0;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 30px;
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
         }
 
         .navbar {
             display: flex;
             justify-content: center;
-            margin-top: 70px;
             background-color: transparent;
             position: fixed;
-            top: 80px; /* Adjust based on the height of the header */
+            top: 80px;
             left: 0;
             width: 100%;
             z-index: 1000;
+            transition: all 0.3s ease;
         }
 
         .navbar a {
@@ -86,6 +96,80 @@
             color: #fff;
         }
 
+        /* Mobile Menu Overlay */
+        .navbar.active {
+            display: block;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100vh;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 60px 20px 20px;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar.active a {
+            display: block;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        /* Media Queries for Mobile Settings */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+                content: "TG TRANSCO";
+            }
+
+            .header h1::before {
+                content: "TG TRANSCO";
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .navbar {
+                display: none;
+            }
+
+            .navbar.active {
+                display: block;
+            }
+
+            .login-container {
+                margin-top: 120px;
+                width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.2rem;
+            }
+
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
+
+            .hamburger {
+                font-size: 24px;
+            }
+
+            .login-container {
+                padding: 20px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .header h1::before {
+                content: "𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃";
+            }
+        }
+
+        /* Rest of your existing styles remain unchanged */
         .login-container {
             background-color: #fff;
             padding: 30px;
@@ -93,19 +177,13 @@
             box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
             text-align: center;
             width: 350px;
-            margin-top: 170px; /* Adjust based on the height of the header and navbar */
+            margin-top: 170px;
             animation: slideIn 1s forwards;
         }
 
         @keyframes slideIn {
-            0% {
-                opacity: 0;
-                transform: translateY(-150px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(-150px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         h2 {
@@ -189,10 +267,10 @@
     </style>
 </head>
 <body>
-
     <header class="header">
         <img src="logo_new.png" alt="Company Logo" class="logo">
-        <h1>Transmission Corporation of Telangana Limited</h1>
+        <h1></h1>
+        <button class="hamburger">☰</button>
     </header>
 
     <div class="navbar">
@@ -223,6 +301,11 @@
     </div>
 
     <script>
+        // Toggle Hamburger Menu
+        document.querySelector('.hamburger').addEventListener('click', function() {
+            document.querySelector('.navbar').classList.toggle('active');
+        });
+
         // Function to toggle password visibility
         function togglePassword() {
             var passwordField = document.getElementById("password");
@@ -236,17 +319,17 @@
             }
         }
 
-    // Clear form fields on page load
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("username").value = "";
-        document.getElementById("password").value = "";
-    });
+        // Clear form fields on page load
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+        });
 
-    // Prevent back button from showing cached pages
-    window.history.pushState(null, null, window.location.href);
-    window.addEventListener("popstate", function () {
-        window.location.reload(true); // Force reload from the server
-    });
+        // Prevent back button from showing cached pages
+        window.history.pushState(null, null, window.location.href);
+        window.addEventListener("popstate", function () {
+            window.location.reload(true);
+        });
     </script>
 </body>
 </html>
