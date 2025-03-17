@@ -157,13 +157,30 @@ tr:nth-child(even) {
     background: #f0f8ff;
 }
 
-.download-container {
+/* Header and Download Button Container */
+.header-download-container {
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
-    margin-right: 10px;
+    justify-content: space-between; /* Pushes h2 to center and button to right */
+    align-items: center; /* Vertically centers both elements */
+    width: 90%; /* Matches table-container width for consistency */
+    margin: 20px auto; /* Centers the container horizontally */
+    padding: 0 10px; /* Optional: adds some padding for spacing */
 }
 
+/* Ensure h2 is centered within its flex space */
+.header-download-container h2 {
+    flex-grow: 1; /* Allows h2 to take up available space */
+    text-align: center; /* Centers the text */
+    margin: 0; /* Removes default margin for precise alignment */
+}
+
+/* Download Container */
+.download-container {
+    flex-shrink: 0; /* Prevents the button from shrinking */
+    display: none; /* Initially hidden */
+}
+
+/* Download Button */
 .download-btn {
     background: red;
     color: white;
