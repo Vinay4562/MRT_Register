@@ -423,6 +423,8 @@ tr:nth-child(even) {
     }
 
     .header-download-container h2 {
+        position: static; /* Remove absolute positioning on mobile */
+        transform: none; /* Remove transform on mobile */
         text-align: center; /* Ensure text remains centered */
     }
 
