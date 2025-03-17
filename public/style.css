@@ -165,6 +165,7 @@ tr:nth-child(even) {
     width: 90%; /* Matches table-container width for consistency */
     margin: 20px auto; /* Centers the container horizontally */
     padding: 0 10px; /* Optional: adds some padding for spacing */
+    position: relative; /* Added to help with centering h2 */
 }
 
 /* Ensure h2 is centered within its flex space */
@@ -172,12 +173,15 @@ tr:nth-child(even) {
     flex-grow: 1; /* Allows h2 to take up available space */
     text-align: center; /* Centers the text */
     margin: 0; /* Removes default margin for precise alignment */
+    position: absolute; /* Added to center h2 independently */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Offset by half its width */
 }
 
 /* Download Container */
 .download-container {
     flex-shrink: 0; /* Prevents the button from shrinking */
-    display: none; /* Initially hidden */
+    display: none; /* Initially hidden until data is loaded */
 }
 
 /* Download Button */
@@ -283,6 +287,7 @@ tr:nth-child(even) {
     height: 40px;
     animation: spin 1s linear infinite;
     margin: auto; /* Ensures the loader itself is centered within the container */
+    margin-top: 100px;
 }
 
 /* Animation for spinning */
@@ -410,6 +415,24 @@ tr:nth-child(even) {
     .filter-buttons button {
         font-size: 12px;
         padding: 8px 10px;
+    }
+    .header-download-container {
+        flex-direction: column; /* Stack elements vertically on small screens */
+        align-items: center; /* Center both elements */
+        gap: 10px; /* Add spacing between elements */
+    }
+
+    .header-download-container h2 {
+        text-align: center; /* Ensure text remains centered */
+    }
+
+    .download-container {
+        margin: 0; /* Remove any extra margins */
+    }
+
+    .download-btn {
+        font-size: 14px; /* Slightly smaller button on mobile */
+        padding: 8px 16px;
     }
 }
 
