@@ -50,8 +50,15 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-const defaultUsername = 'Shankarpally400kv';
-const hashedPassword = bcrypt.hashSync('Shankarpally@9870', 10);
+// Load credentials from .env
+const defaultUsername = process.env.DEFAULT_USERNAME;
+const hashedPassword = process.env.DEFAULT_PASSWORD_HASH;
+
+// Validate credentials are loaded
+if (!defaultUsername || !hashedPassword) {
+    console.error('Error: DEFAULT_USERNAME or DEFAULT_PASSWORD_HASH not set in .env');
+    process.exit(1);
+}
 
 passport.use(new LocalStrategy((username, password, done) => {
     if (!username || !password) {
@@ -159,7 +166,7 @@ app.delete('/feeders/:id', async (req, res) => {
     }
 });
 
-// ✅ Function to Parse DD-MM-YYYY format (unchanged)
+// ✅ Function to Parse DD-MM-YYYY format
 function parseDDMMYYYY(dateString) {
     if (!dateString) return null;
 
@@ -174,7 +181,7 @@ function parseDDMMYYYY(dateString) {
     return date;
 }
 
-// ✅ Nodemailer Setup (unchanged)
+// ✅ Nodemailer Setup
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -183,7 +190,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// ✅ Send Email Function (updated message)
+// ✅ Send Email Function
 async function sendEmail(feederName, scheduledDate) {
     const mailOptions = {
         from: process.env.EMAIL_USER,
@@ -204,10 +211,10 @@ async function sendEmail(feederName, scheduledDate) {
     }
 }
 
-// ✅ Twilio SMS Setup (unchanged)
+// ✅ Twilio SMS Setup
 const twilioClient = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-// ✅ Send SMS Function (updated message)
+// ✅ Send SMS Function
 async function sendSMS(feederName, scheduledDate) {
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
         console.error("❌ Twilio credentials missing! Check .env file.");
@@ -226,7 +233,7 @@ async function sendSMS(feederName, scheduledDate) {
     }
 }
 
-// ✅ Fetch Feeders Scheduled for Tomorrow (renamed and updated)
+// ✅ Fetch Feeders Scheduled for Tomorrow
 async function getFeedersScheduledForTomorrow() {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0); // Normalize to start of today
@@ -362,7 +369,7 @@ app.get('/test-sms', async (req, res) => {
     }
 });
 
-// Manual Test Route for Email (Add this below /test-sms)
+// Manual Test Route for Email
 app.get('/test-email', async (req, res) => {
     const feeder = await Feeder.findOne();
     if (!feeder) return res.status(404).send("No scheduled feeders found.");
